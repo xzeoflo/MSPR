@@ -1,0 +1,56 @@
+# Voir https://help.github.com/articles/ignoring-files/ pour plus d'informations.
+
+# 1. DÉPENDANCES ET CACHES GLOBAUX (pour pnpm workspaces)
+# --------------------------------------------------------------------
+/node_modules              # Pour toute node_modules qui pourrait être à la racine
+/.pnpm-store               # Cache pnpm global
+.pnpm-lock.yaml            # Si vous n'utilisez pas de lockfile global
+.pnpm-debug.log*
+
+# 2. FRONT-END (mspr-front - Next.js)
+# --------------------------------------------------------------------
+# Dépendances
+/mspr-front/node_modules
+/mspr-front/.pnp
+/mspr-front/.pnp.*
+/mspr-front/.yarn
+/mspr-front/yarn-debug.log*
+/mspr-front/yarn-error.log*
+/mspr-front/npm-debug.log*
+
+# Next.js
+/mspr-front/.next/
+/mspr-front/out/
+/mspr-front/build
+
+# TypeScript
+/mspr-front/*.tsbuildinfo
+/mspr-front/next-env.d.ts
+
+# 3. BACK-END (mspr-back - Java/Maven ou Gradle)
+# --------------------------------------------------------------------
+# Fichiers compilés, binaires et build
+/mspr-back/target/      # Pour Maven (fichiers .class et packages)
+/mspr-back/build/       # Pour Gradle ou autres outils
+/mspr-back/*.jar
+/mspr-back/*.war
+/mspr-back/*.zip
+
+# Fichiers d'IDE (Exemples : IntelliJ, Eclipse, VS Code)
+/mspr-back/.idea/
+/mspr-back/*.iws
+/mspr-back/*.iml
+/mspr-back/.settings/
+/mspr-back/.vscode/
+
+# 4. MISCELLANÉES & ENVRONNEMENT
+# --------------------------------------------------------------------
+# Fichiers macOS / Windows
+.DS_Store
+*.pem
+
+# Fichiers d'environnement (pour tous les sous-dossiers)
+.env*
+
+# Vercel
+.vercel
