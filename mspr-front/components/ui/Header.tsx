@@ -10,7 +10,7 @@ export default function Header() {
   return (
     <header className="w-full h-16 flex items-center justify-between bg-stone-950 text-white p-4 border-b border-stone-800 shadow-xl">
 
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 pl-2">
         <h1 className="text-lg font-semibold tracking-tight text-white">
           MSPR
         </h1>

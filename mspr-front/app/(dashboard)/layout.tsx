@@ -1,7 +1,4 @@
 // app/(dashboard)/layout.tsx
-
-'use client';
-
 import Sidebar from '@/components/ui/Sidebar';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
