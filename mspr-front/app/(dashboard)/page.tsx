@@ -1,3 +1,8 @@
-export default function Dashboard() {
-  return <h1 className="">Dashboard home</h1>
+// app/(dashboard)/page.js
+export default function DashboardPage() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+    </div>
+  )
 }
