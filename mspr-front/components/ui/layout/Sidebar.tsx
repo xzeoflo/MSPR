@@ -16,8 +16,16 @@ export default function Sidebar() {
 
   return (
 
-    <aside className="w-25 shrink-0 p-2 h-full flex flex-col bg-neutral-950 text-stone-400 border-r border-neutral-800">
-
+    <aside className="
+          relative w-25 shrink-0 p-2 h-full flex flex-col text-stone-400
+          after:content-['']
+          after:absolute
+          after:right-0
+          after:top-[1%]
+          after:h-[99%]
+          after:w-[1px]
+          after:bg-neutral-800
+        ">
       <nav className="flex flex-col space-y-1 flex-1">
         <ul className="space-y-3">
           {navItems.map((item) => (
