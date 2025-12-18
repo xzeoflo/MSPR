@@ -16,7 +16,7 @@ export default function Sidebar() {
 
   return (
 
-    <aside className="w-25 shrink-0 p-2 h-full flex flex-col bg-stone-950 text-gray-400 border-r border-stone-800">
+    <aside className="w-25 shrink-0 p-2 h-full flex flex-col bg-neutral-950 text-stone-400 border-r border-neutral-800">
 
       <nav className="flex flex-col space-y-1 flex-1">
         <ul className="space-y-3">
@@ -24,10 +24,10 @@ export default function Sidebar() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`${linkClasses} hover:bg-stone-800 hover:text-white`}
+                className={`${linkClasses} hover:bg-neutral-800 hover:text-white`}
               >
                 <item.icon className={iconClasses} />
-                <span className="absolute left-full ml-3 px-3 py-1 text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-stone-700 text-white">
+                <span className="absolute left-full ml-3 px-3 py-1 text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-neutral-700 text-white">
                   {item.tooltip}
                 </span>
               </Link>
@@ -36,7 +36,7 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      <div className="pt-4 space-y-1 border-t border-stone-800">
+      <div className="pt-4 space-y-1 border-t border-neutral-800">
         <Link
           href="/"
           className={`${linkClasses} hover:bg-stone-800 hover:text-white`}

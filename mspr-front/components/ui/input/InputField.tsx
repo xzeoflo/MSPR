@@ -10,7 +10,7 @@ interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export default function InputField({ label, icon: Icon, id, ...props }: InputFieldProps) {
-  const inputClasses = "flex h-10 w-full rounded-md border border-stone-800 bg-stone-950 px-3 py-2 text-sm ring-offset-stone-950 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-stone-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-300 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 text-white";
+  const inputClasses = "flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm ring-offset-neutral-950 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-stone-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-300 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 text-white";
 
   return (
     <div>
