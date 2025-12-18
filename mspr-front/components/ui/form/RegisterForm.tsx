@@ -3,11 +3,11 @@ import { Lock, Mail } from 'lucide-react';
 import InputField from '@/components/ui/input/InputField';
 import Button from '@/components/ui/button/Button';
 
-export default function LoginForm() {
+export default function RegisterForm() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-center">
-        Login
+        Register
       </h1>
       <form className="space-y-4">
 
@@ -28,13 +28,21 @@ export default function LoginForm() {
           placeholder="••••••••"
           required
         />
+        <InputField
+          id="confirmPassword"
+          label="Confirm Password"
+          icon={Lock}
+          type="password"
+          placeholder="••••••••"
+          required
+        />
         <p className="px-8 text-center text-sm text-stone-400">
           <a href="#" className="hover:text-neutral-200 duration-300 underline underline-offset-4">
-            forgot password ?
+            Already have an account ?
           </a>
         </p>
         <Button
-          title="Sign In"
+          title="Sign Up"
         />
       </form>
 
