@@ -23,19 +23,22 @@ export default function Sidebar() {
           after:right-0
           after:top-[1%]
           after:h-[99%]
-          after:w-[1px]
+          after:w-px
           after:bg-neutral-800
         ">
-      <nav className="flex flex-col space-y-1 flex-1">
+      <div className="flex justify-center items-center text-sm text-white font-medium transition-colors duration-200 w-full relative group pb-6 pt-6">
+        <div className="text-xl font-bold">MSPR</div>
+      </div>
+      <nav className="flex flex-col space-y-1 flex-1 pt-6 border-t border-neutral-800 ">
         <ul className="space-y-3">
           {navItems.map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`${linkClasses} hover:bg-neutral-800 hover:text-white`}
+                className={`${linkClasses} hover:bg-stone-800 hover:text-white`}
               >
                 <item.icon className={iconClasses} />
-                <span className="absolute left-full ml-3 px-3 py-1 text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-neutral-700 text-white">
+                <span className="absolute left-full ml-3 px-3 py-1 text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-stone-800 text-white">
                   {item.tooltip}
                 </span>
               </Link>
