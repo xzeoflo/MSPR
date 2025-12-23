@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import { Rat } from 'lucide-react';
 
 export default function RootLayout({
   children,
@@ -9,8 +10,9 @@ export default function RootLayout({
     <main className="flex min-h-screen w-full">
       <div className="relative hidden lg:block w-1/2 bg-neutral-900 border-r border-stone-700 ">
         <div className="absolute top-8 left-8">
+
           <span className="text-2xl font-black tracking-tight text-white">
-            MSPR
+            <Rat size={62} />MSPR
           </span>
         </div>
       </div>
