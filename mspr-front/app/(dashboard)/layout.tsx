@@ -1,26 +1,27 @@
 // app/(dashboard)/layout.tsx
-import Sidebar from '@/components/ui/layout/Sidebar';
-import Footer from '@/components/ui/layout/Footer';
+import { AppSidebar } from "@/components/ui/layout/app-sidebar";
+import Footer from "@/components/ui/layout/Footer";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      <div className="flex flex-1">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto flex flex-col">
-          <div className="flex-1 p-6 md:p-10 mt-4 ml-4">
-            {children}
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex h-screen overflow-hidden bg-background text-foreground">
+        <AppSidebar />
+        <main className="flex flex-1 flex-col overflow-y-auto">
+          <SidebarTrigger />
+          <div className="flex-1 p-6 md:p-10">
+            <div className="mx-auto max-w-7xl">{children}</div>
           </div>
-          <Footer />
+          <footer className="border-t border-border/40">
+            <Footer />
+          </footer>
         </main>
-
       </div>
-
-    </div>
-  )
+    </SidebarProvider>
+  );
 }
