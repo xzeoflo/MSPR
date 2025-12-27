@@ -1,51 +1,63 @@
-// components/ui/LoginForm.tsx
-import { Lock, Mail } from 'lucide-react';
-import InputField from '@/components/ui/input/InputField';
-import Button from '@/components/ui/button/Button';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export default function RegisterForm() {
+export function RegisterForm() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-center">
-        Register
-      </h1>
-      <form className="space-y-4">
-
-        <InputField
-          id="email"
-          label="Email"
-          icon={Mail}
-          type="email"
-          placeholder="email@exemple.com"
-          required
-        />
-
-        <InputField
-          id="password"
-          label="Password"
-          icon={Lock}
-          type="password"
-          placeholder="••••••••"
-          required
-        />
-        <InputField
-          id="confirmPassword"
-          label="Confirm Password"
-          icon={Lock}
-          type="password"
-          placeholder="••••••••"
-          required
-        />
-        <p className="px-8 text-center text-sm text-stone-400">
-          <a href="#" className="hover:text-neutral-200 duration-300 underline underline-offset-4">
-            Already have an account ?
-          </a>
-        </p>
-        <Button
-          title="Sign Up"
-        />
-      </form>
-
-    </div>
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Create an account</CardTitle>
+        <CardDescription>
+          Enter your details below to create your account
+        </CardDescription>
+        <CardAction>
+          <Button variant="link">Login</Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <form>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input id="name" type="text" placeholder="John Doe" required />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" required />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Input id="confirm-password" type="password" required />
+            </div>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter className="flex-col gap-2">
+        <Button type="submit" className="w-full">
+          Sign Up
+        </Button>
+        <Button variant="outline" className="w-full">
+          Sign up with Google
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
