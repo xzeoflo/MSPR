@@ -1,7 +1,6 @@
 package com.example.demo.controllers;
 
 
-
 import com.example.demo.models.User;
 import com.example.demo.services.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
