@@ -4,23 +4,33 @@ package com.example.demo.models;
 import com.example.demo.models.enums.UserRole;
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 
 public class User {
     private int id;
     private String email;
-    private String name;
+    private String password;
+    private String firstname;
+    private String lastname;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
+    private Date Birthday;
+    private Enum gender;
+    private enum subscriptionTier;
+    private enum activity_level;
+
+
     public User() {
     }
 
-    public User(int id, String email, String name, UserRole role) {
+    public User(int id, String email, String firstname, UserRole role) {
         this.id = id;
         this.email = email;
-        this.name = name;
+        this.firstname = firstname;
         this.role = role;
     }
 
@@ -30,8 +40,8 @@ public class User {
     public String getEmail() {
         return email;
     }
-    public String getName() {
-        return name;
+    public String getFirstname() {
+        return firstname;
     }
     public UserRole getRole() {
         return role;
