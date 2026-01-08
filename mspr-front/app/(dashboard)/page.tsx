@@ -1,8 +1,17 @@
-// app/(dashboard)/page.js
+import CardData from "@/components/ui/card/CardData";
+
 export default function DashboardPage() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div className="flex flex-col gap-4">
+      <CardData title="Data" description="Graph de la data">
+        Composant data
+      </CardData>
+      <CardData title="Data" description="Graph de la data">
+        Composant data
+      </CardData>
+      <CardData title="Data" description="Graph de la data">
+        Composant data
+      </CardData>
     </div>
-  )
+  );
 }
