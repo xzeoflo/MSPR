@@ -23,7 +23,7 @@ public class User {
     private enum subscriptionTier;
     private enum activity_level;
 
-
+    private String test;
     public User() {
     }
 
