@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import { Calendar, Home, Inbox, Search, Settings, LogOut } from "lucide-react";
 
 import {
   Sidebar,
@@ -33,9 +33,9 @@ const items = [
     icon: Search,
   },
   {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "Disconnect",
+    url: "/login",
+    icon: LogOut,
   },
 ];
 

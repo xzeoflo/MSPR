@@ -1,4 +1,3 @@
-// app/(dashboard)/layout.tsx
 import { AppSidebar } from "@/components/ui/layout/app-sidebar";
 import Footer from "@/components/ui/layout/Footer";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";

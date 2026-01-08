@@ -21,7 +21,7 @@ export default function RootLayout({
         </div>
 
         <div className="mt-auto">
-          <p className="text-sm max-w-sm text-foreground">
+          <p className="text-sm max-w-sm text-secondary">
             Plateforme sécurisée de gestion et analyse de données.
           </p>
         </div>
