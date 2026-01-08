@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
 export function RegisterForm() {
   return (
@@ -20,7 +21,9 @@ export function RegisterForm() {
           Enter your details below to create your account
         </CardDescription>
         <CardAction>
-          <Button variant="link">Login</Button>
+          <Button variant="link" asChild>
+            <Link href="/login">Login</Link>
+          </Button>
         </CardAction>
       </CardHeader>
       <CardContent>
@@ -52,10 +55,10 @@ export function RegisterForm() {
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Button type="submit" className="w-full">
-          Sign Up
+          Register
         </Button>
         <Button variant="outline" className="w-full">
-          Sign up with Google
+          Register with Google
         </Button>
       </CardFooter>
     </Card>

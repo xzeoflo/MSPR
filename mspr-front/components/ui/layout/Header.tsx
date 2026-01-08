@@ -1,5 +1,3 @@
-// components/Header.tsx
-
 import { Bell, User } from 'lucide-react';
 import Link from 'next/link';
 
