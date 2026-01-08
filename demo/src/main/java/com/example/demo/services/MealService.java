@@ -11,6 +11,7 @@ import java.util.List;
 public class MealService {
 
     private final MealRepository repository;
+    private final MealService service;
 
     public MealService(MealRepository repository) {
         this.repository = repository;
