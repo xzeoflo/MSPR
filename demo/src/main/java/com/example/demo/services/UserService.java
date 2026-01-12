@@ -18,18 +18,6 @@ public class UserService {
         this.repository = repository;
     }
 
-    public User findByEmail(String email) throws SQLException {
-        return (User) repository.findByEmail(email);
-    }
-
-    public List<User> findAll() throws SQLException {
-        return repository.findAll();
-    }
-
-    public void save(User user) throws SQLException {
-        repository.save(user);
-    }
-
     public User getCurrentUser() {
         return currentUser;
     }

@@ -1,16 +1,11 @@
 package com.example.demo.repositories;
 
 import com.example.demo.models.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface UserRepository  <User, Integer> {
-    User findByEmail(String email);
-
-    List<com.example.demo.models.User> findAll();
-
-    void save(com.example.demo.models.User user);
+public interface UserRepository extends JpaRepository<User, Integer> {
+    Optional<User> findByEmail(String email);
 }
-
