@@ -2,14 +2,16 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.User;
 import com.example.demo.services.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     private final AuthService authService;
@@ -18,28 +20,42 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
-        try {
-            return ResponseEntity.ok(authService.register(user));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/register/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> registerAdmin(@RequestBody User user) {
+        return ResponseEntity.ok(authService.registerAdmin(user));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        try {
-            String email = credentials.get("email");
-            String password = credentials.get("password");
-            return ResponseEntity.ok(authService.login(email, password));
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body(e.getMessage());
-        }
+    @PostMapping("/register/coach")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> registerCoach(@RequestBody User user) {
+        return ResponseEntity.ok(authService.registerCoach(user));
+    }
+
+    @PostMapping("/register/client")
+    public ResponseEntity<User> registerClient(@RequestBody User user) {
+        return ResponseEntity.ok(authService.registerClient(user));
+    }
+
+    @PostMapping("/login/admin")
+    public ResponseEntity<User> loginAdmin(@RequestBody Map<String, String> credentials) {
+        return ResponseEntity.ok(authService.loginAdmin(credentials.get("email"), credentials.get("password")));
+    }
+
+    @PostMapping("/login/coach")
+    public ResponseEntity<User> loginCoach(@RequestBody Map<String, String> credentials) {
+        return ResponseEntity.ok(authService.loginCoach(credentials.get("email"), credentials.get("password")));
+    }
+
+    @PostMapping("/login/client")
+    public ResponseEntity<User> loginClient(@RequestBody Map<String, String> credentials) {
+        return ResponseEntity.ok(authService.loginClient(credentials.get("email"), credentials.get("password")));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        return ResponseEntity.ok("Déconnexion réussie");
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.logout(request, null, null);
+        return ResponseEntity.ok(Map.of("message", "Logout successful"));
     }
 }
