@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.models.User;
+import com.example.demo.models.Workout;
 import com.example.demo.models.enums.UserRole;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.validators.UserValidator;
@@ -94,5 +95,10 @@ public class UserService {
     public void deleteUser(Integer id, String requestingUserPartnerBrand) {
         User user = getUserById(id, requestingUserPartnerBrand);
         userRepository.delete(user);
+    }
+
+    public List<Workout> getCompletedWorkouts(Integer userId, String requestingUserPartnerBrand) {
+        User user = getUserById(userId, requestingUserPartnerBrand);
+        return user.getCompletedWorkouts();
     }
 }

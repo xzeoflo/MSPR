@@ -1,5 +1,8 @@
+com\example\demo\models\Exercise.class
 com\example\demo\repositories\UserRepository.class
 com\example\demo\controllers\UserController.class
+com\example\demo\repositories\ExerciseRepository.class
+com\example\demo\services\WorkoutService.class
 com\example\demo\models\User.class
 com\example\demo\models\enums\UserRole.class
 com\example\demo\services\AuthService.class
@@ -7,6 +10,9 @@ com\example\demo\config\SecurityConfig.class
 com\example\demo\config\DataInitializer.class
 com\example\demo\validators\UserValidator.class
 com\example\demo\services\UserService.class
+com\example\demo\controllers\WorkoutController.class
 com\example\demo\models\enums\SubscriptionTier.class
+com\example\demo\models\Workout.class
+com\example\demo\repositories\WorkoutRepository.class
 com\example\demo\controllers\AuthController.class
 com\example\demo\MsprApplication.class
