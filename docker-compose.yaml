@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # La Base de Données
+  db:
+    image: postgres:15-alpine
+    container_name: healthai-db
+    restart: always
+    environment:
+      POSTGRES_USER: health_admin
+      POSTGRES_PASSWORD: secure_password_123
+      POSTGRES_DB: healthai_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # Interface web pour voir la BDD
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+
+volumes:
+  db_data:

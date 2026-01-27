@@ -1,0 +1,12 @@
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\config\DataInitializer.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\config\SecurityConfig.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\controllers\AuthController.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\controllers\UserController.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\models\enums\SubscriptionTier.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\models\enums\UserRole.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\models\User.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\MsprApplication.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\repositories\UserRepository.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\services\AuthService.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\services\UserService.java
+C:\epsi\MSPR\MSPR\demo\src\main\java\com\example\demo\validators\UserValidator.java
