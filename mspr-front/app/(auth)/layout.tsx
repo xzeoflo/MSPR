@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import { Rat } from "lucide-react";
 
-export default function RootLayout({
+export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
