@@ -2,16 +2,10 @@
 
 import * as React from "react";
 import {
-  IconCamera,
-  IconChartBar,
   IconDashboard,
   IconDatabase,
-  IconFileAi,
-  IconFileDescription,
   IconFileWord,
-  IconFolder,
   IconHelp,
-  IconListDetails,
   IconReport,
   IconSearch,
   IconSettings,
@@ -31,6 +25,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Rat } from "lucide-react";
+import Link from "next/link";
 
 const data = {
   user: {
@@ -45,9 +40,9 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Sport",
-      url: "/sport",
-      icon: IconListDetails,
+      title: "Users",
+      url: "/users",
+      icon: IconUsers,
     },
   ],
   navSecondary: [
@@ -96,10 +91,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5"
             >
-              <a href="/">
+              <Link href="/dashboard">
                 <Rat />
-                <span className="text-base font-semibold">MSPR</span>
-              </a>
+                <span className="text-base font-semibold">HealthAi</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
