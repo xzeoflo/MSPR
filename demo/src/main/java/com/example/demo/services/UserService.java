@@ -2,11 +2,9 @@ package com.example.demo.services;
 
 import com.example.demo.models.User;
 import com.example.demo.models.Workout;
-import com.example.demo.models.enums.UserRole;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.validators.UserValidator;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

@@ -1,11 +1,14 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.WorkoutDTO;
 import com.example.demo.models.Workout;
 import com.example.demo.models.User;
 import com.example.demo.services.WorkoutService;
 import com.example.demo.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -24,9 +27,13 @@ public class WorkoutController {
     }
 
     private String getRequestingUserPartner(Principal principal) {
-        if (principal == null) return null;
-        User currentUser = userService.getUserByEmail(principal.getName(), null);
-        return currentUser.getPartnerBrand();
+        if (principal instanceof Authentication authentication) {
+            Object userPrincipal = authentication.getPrincipal();
+            if (userPrincipal instanceof User user) {
+                return user.getPartnerBrand();
+            }
+        }
+        return null;
     }
 
     @GetMapping
@@ -83,5 +90,61 @@ public class WorkoutController {
     public ResponseEntity<List<Workout>> getUserHistory(@PathVariable Integer userId, Principal principal) {
         String brand = getRequestingUserPartner(principal);
         return ResponseEntity.ok(userService.getCompletedWorkouts(userId, brand));
+    }
+
+    @GetMapping("/filter/exerciseType")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
+    public ResponseEntity<List<Workout>> getWorkoutsByExType(
+            @RequestParam String type,
+            Principal principal) {
+        String brand = getRequestingUserPartner(principal);
+        return ResponseEntity.ok(workoutService.getWorkoutsByExerciseType(type, brand));
+    }
+
+    @GetMapping("/filter/workoutType")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
+    public ResponseEntity<List<Workout>> getWorkoutsByWType(
+            @RequestParam String type,
+            Principal principal) {
+        String brand = getRequestingUserPartner(principal);
+        return ResponseEntity.ok(workoutService.getWorkoutsByType(type, brand));
+    }
+
+    @GetMapping("/filter/pure")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
+    public ResponseEntity<List<Workout>> getPureWorkouts(
+            @RequestParam String workoutType,
+            @RequestParam String exerciseType,
+            Principal principal) {
+        String brand = getRequestingUserPartner(principal);
+        return ResponseEntity.ok(workoutService.getPureWorkouts(workoutType, exerciseType, brand));
+    }
+
+    @GetMapping("/export")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
+    public ResponseEntity<List<WorkoutDTO>> exportWorkouts(Principal principal) {
+        String brand = getRequestingUserPartner(principal);
+        List<WorkoutDTO> data = workoutService.exportWorkouts(brand);
+        String fileName = "export_workouts_" + (brand != null ? brand.toLowerCase() : "all") + ".json";
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                .header("Content-Type", "application/json")
+                .body(data);
+    }
+
+    @PostMapping("/import")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
+    public ResponseEntity<String> importWorkouts(
+            @RequestBody @Valid List<WorkoutDTO> workoutDTOs,
+            Principal principal) {
+
+        String brand = getRequestingUserPartner(principal);
+        try {
+            workoutService.importWorkouts(workoutDTOs, brand);
+            return ResponseEntity.ok("Importation réussie de " + workoutDTOs.size() + " workouts.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erreur lors de l'import : " + e.getMessage());
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.AuthenticationResponse;
 import com.example.demo.models.User;
 import com.example.demo.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,17 +39,17 @@ public class AuthController {
     }
 
     @PostMapping("/login/admin")
-    public ResponseEntity<User> loginAdmin(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<AuthenticationResponse> loginAdmin(@RequestBody Map<String, String> credentials) {
         return ResponseEntity.ok(authService.loginAdmin(credentials.get("email"), credentials.get("password")));
     }
 
     @PostMapping("/login/coach")
-    public ResponseEntity<User> loginCoach(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<AuthenticationResponse> loginCoach(@RequestBody Map<String, String> credentials) {
         return ResponseEntity.ok(authService.loginCoach(credentials.get("email"), credentials.get("password")));
     }
 
     @PostMapping("/login/client")
-    public ResponseEntity<User> loginClient(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<AuthenticationResponse> loginClient(@RequestBody Map<String, String> credentials) {
         return ResponseEntity.ok(authService.loginClient(credentials.get("email"), credentials.get("password")));
     }
 

@@ -4,6 +4,7 @@ import com.example.demo.models.User;
 import com.example.demo.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -21,9 +22,21 @@ public class UserController {
     }
 
     private String getRequestingUserPartner(Principal principal) {
-        if (principal == null) return null;
-        User currentUser = userService.getUserByEmail(principal.getName(), null);
-        return currentUser.getPartnerBrand();
+        if (principal instanceof Authentication authentication) {
+            Object userPrincipal = authentication.getPrincipal();
+            if (userPrincipal instanceof User user) {
+                return user.getPartnerBrand();
+            }
+        }
+        return null;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<User> getMyProfile(Principal principal) {
+        if (principal instanceof Authentication authentication) {
+            return ResponseEntity.ok((User) authentication.getPrincipal());
+        }
+        return ResponseEntity.status(401).build();
     }
 
     @GetMapping
@@ -48,12 +61,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
     public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User userDetails, Principal principal) {
         String brand = getRequestingUserPartner(principal);
         return ResponseEntity.ok(userService.updateUser(id, userDetails, brand));
     }
 
     @PatchMapping("/{id}/password")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
     public ResponseEntity<Map<String, String>> changePassword(
             @PathVariable Integer id,
             @RequestBody Map<String, String> passwords,

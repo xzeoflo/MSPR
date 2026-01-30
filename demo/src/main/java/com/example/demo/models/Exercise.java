@@ -21,6 +21,7 @@ public class Exercise {
     private Integer sets;
     private Integer caloriesBurned;
     private String intensityLevel;
+    private String exerciseType;
 
     private Integer sequenceOrder;
 

@@ -1,5 +1,12 @@
+-- Nettoyage préalable (Optionnel si tu es en ddl-auto=create)
+-- DELETE FROM user_workouts;
+-- DELETE FROM exercises;
+-- DELETE FROM workouts;
+-- DELETE FROM users;
+
 -- =============================================
--- 1. USERS (5 profils : 2 Coachs, 3 Clients)
+-- 1. USERS (2 Coachs, 3 Clients)
+-- Le mot de passe est 'password123' (BCrypt)
 -- =============================================
 INSERT INTO users (email, password, firstname, lastname, role, partner_brand, subscription_tier) VALUES
 ('coach.nike@test.com', '$2a$10$8.UnVuG9HHgffUDAlk8q2OuVGkqEnLPz0zke.6vNAnv3N.8p.EomG', 'Marc', 'NikeCoach', 'COACH', 'Nike', 'PREMIUM'),
@@ -9,42 +16,40 @@ INSERT INTO users (email, password, firstname, lastname, role, partner_brand, su
 ('client.adidas@test.com', '$2a$10$8.UnVuG9HHgffUDAlk8q2OuVGkqEnLPz0zke.6vNAnv3N.8p.EomG', 'Kevin', 'Yoga', 'CLIENT', 'Adidas', 'FREEMIUM');
 
 -- =============================================
--- 2. WORKOUTS (5 programmes)
+-- 2. WORKOUTS
 -- =============================================
-INSERT INTO workouts (id, title, description, difficulty, partner_brand) VALUES
-(1, 'Nike Morning HIIT', 'Quick high intensity session', 'Intermediate', 'Nike'),
-(2, 'Power Lift Nike', 'Heavy weight session', 'Advanced', 'Nike'),
-(3, 'Adidas Cardio Flow', 'Endurance and breathing', 'Beginner', 'Adidas'),
-(4, 'Nike Core Express', 'Abs workout', 'Beginner', 'Nike'),
-(5, 'Adidas Strength 101', 'Basic full body strength', 'Intermediate', 'Adidas');
+INSERT INTO workouts (title, description, difficulty, partner_brand, workout_type) VALUES
+('Nike Morning HIIT', 'Quick high intensity session', 'Intermediate', 'Nike', 'HIIT'),
+('Power Lift Nike', 'Heavy weight session', 'Advanced', 'Nike', 'STRENGTH'),
+('Adidas Cardio Flow', 'Endurance and breathing', 'Beginner', 'Adidas', 'CARDIO'),
+('Nike Core Express', 'Abs workout', 'Beginner', 'Nike', 'CORE'),
+('Adidas Strength 101', 'Basic full body strength', 'Intermediate', 'Adidas', 'STRENGTH');
 
 -- =============================================
--- 3. EXERCISES (2-3 par workout)
+-- 3. EXERCISES
 -- =============================================
--- Exercises for Workout 1 (Nike HIIT)
-INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id) VALUES
-('Burpees', 'Full body cardio', 60, 15, 3, 45, 'High', 1, 1),
-('Mountain Climbers', 'Core and cardio', 45, 40, 3, 30, 'Medium', 2, 1),
-('Sprints', 'Max speed', 30, 1, 5, 50, 'Very High', 3, 1);
+-- Pour Workout 1 (Nike HIIT)
+INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id, exercise_type) VALUES
+('Burpees', 'Full body cardio', 60, 15, 3, 45, 'High', 1, 1, 'CARDIO'),
+('Mountain Climbers', 'Core and cardio', 45, 40, 3, 30, 'Medium', 2, 1, 'CARDIO'),
+('Sprints', 'Max speed', 30, 1, 5, 50, 'Very High', 3, 1, 'CARDIO');
 
--- Exercises for Workout 2 (Power Lift Nike)
-INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id) VALUES
-('Deadlift', 'Back and legs', 120, 5, 5, 80, 'Very High', 1, 2),
-('Bench Press', 'Chest power', 120, 8, 4, 60, 'High', 2, 2);
+-- Pour Workout 2 (Power Lift Nike)
+INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id, exercise_type) VALUES
+('Deadlift', 'Back and legs', 120, 5, 5, 80, 'Very High', 1, 2, 'STRENGTH'),
+('Bench Press', 'Chest power', 120, 8, 4, 60, 'High', 2, 2, 'STRENGTH');
 
--- Exercises for Workout 3 (Adidas Cardio Flow)
-INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id) VALUES
-('Jumping Jacks', 'Warmup cardio', 60, 50, 3, 25, 'Low', 1, 3),
-('Running in place', 'Easy cardio', 300, 0, 1, 120, 'Medium', 2, 3),
-('Plank', 'Static hold', 60, 0, 3, 15, 'Medium', 3, 3);
+-- Pour Workout 3 (Adidas Cardio Flow)
+INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id, exercise_type) VALUES
+('Jumping Jacks', 'Warmup cardio', 60, 50, 3, 25, 'Low', 1, 3, 'CARDIO'),
+('Plank', 'Static hold', 60, 0, 3, 15, 'Medium', 3, 3, 'CORE');
 
--- Exercises for Workout 4 (Nike Core)
-INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id) VALUES
-('Crunches', 'Upper abs', 60, 25, 3, 20, 'Medium', 1, 4),
-('Leg Raises', 'Lower abs', 60, 15, 3, 20, 'Medium', 2, 4);
+-- Pour Workout 4 (Nike Core)
+INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id, exercise_type) VALUES
+('Crunches', 'Upper abs', 60, 25, 3, 20, 'Medium', 1, 4, 'CORE'),
+('Leg Raises', 'Lower abs', 60, 15, 3, 20, 'Medium', 2, 4, 'CORE');
 
--- Exercises for Workout 5 (Adidas Strength)
-INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id) VALUES
-('Squats', 'Leg strength', 90, 15, 4, 40, 'Medium', 1, 5),
-('Pushups', 'Chest strength', 60, 12, 4, 30, 'Medium', 2, 5),
-('Lunges', 'Balance and legs', 60, 20, 3, 35, 'Medium', 3, 5);
+-- Pour Workout 5 (Adidas Strength)
+INSERT INTO exercises (name, description, duration_in_seconds, repetitions, sets, calories_burned, intensity_level, sequence_order, workout_id, exercise_type) VALUES
+('Squats', 'Leg strength', 90, 15, 4, 40, 'Medium', 1, 5, 'STRENGTH'),
+('Pushups', 'Chest strength', 60, 12, 4, 30, 'Medium', 2, 5, 'STRENGTH');

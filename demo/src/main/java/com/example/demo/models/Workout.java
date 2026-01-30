@@ -19,6 +19,7 @@ public class Workout {
     private String title;
     private String description;
     private String difficulty;
+    private String workoutType;
 
     @Column(name = "partner_brand")
     private String partnerBrand;
