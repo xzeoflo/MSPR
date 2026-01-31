@@ -1,12 +1,23 @@
 "use client";
+
 import * as React from "react";
 import { DndContext, closestCenter, MouseSensor, TouchSensor, KeyboardSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { useReactTable, getCoreRowModel, getPaginationRowModel, getFilteredRowModel, getSortedRowModel, flexRender, SortingState, VisibilityState, ColumnFiltersState } from "@tanstack/react-table";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  flexRender,
+  SortingState,
+  VisibilityState,
+  ColumnFiltersState
+} from "@tanstack/react-table";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IconLayoutColumns, IconPlus, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -25,10 +36,11 @@ export function DataTable({ data: initialData }: { data: User[] }) {
   React.useEffect(() => { setData(initialData); }, [initialData]);
 
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor), useSensor(KeyboardSensor));
-  const dataIds = React.useMemo(() => data?.map(({ id }) => id) || [], [data]);
+  const dataIds = React.useMemo(() => data?.map(({ id }) => id.toString()) || [], [data]);
 
   const table = useReactTable({
-    data, columns,
+    data,
+    columns,
     state: { sorting, columnVisibility, rowSelection, columnFilters, pagination },
     getRowId: (row) => row.id.toString(),
     onRowSelectionChange: setRowSelection,
@@ -42,38 +54,59 @@ export function DataTable({ data: initialData }: { data: User[] }) {
     getSortedRowModel: getSortedRowModel(),
   });
 
+  const handleTabChange = (value: string) => {
+    if (value === "all") {
+      table.getColumn("role")?.setFilterValue(undefined);
+    } else {
+      table.getColumn("role")?.setFilterValue(value.toUpperCase());
+    }
+  };
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
       setData((prev) => {
-        const oldIndex = dataIds.indexOf(active.id as number);
-        const newIndex = dataIds.indexOf(over.id as number);
+        const oldIndex = prev.findIndex((item) => item.id.toString() === active.id);
+        const newIndex = prev.findIndex((item) => item.id.toString() === over.id);
         return arrayMove(prev, oldIndex, newIndex);
       });
     }
   }
 
   return (
-    <Tabs defaultValue="all" className="w-full">
+    <Tabs defaultValue="all" className="w-full" onValueChange={handleTabChange}>
       <div className="flex items-center justify-between p-4">
         <TabsList>
-          <TabsTrigger value="all">Tous</TabsTrigger>
-          <TabsTrigger value="admins">Admins</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="admin">Admins</TabsTrigger>
+          <TabsTrigger value="coach">Coaches</TabsTrigger>
+          <TabsTrigger value="client">Clients</TabsTrigger>
         </TabsList>
         <div className="flex gap-2">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild><Button variant="outline" size="sm"><IconLayoutColumns size={16} /> Colonnes</Button></DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <IconLayoutColumns size={16} /> Columns
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {table.getAllColumns().filter(c => c.getCanHide()).map(c => (
-                <DropdownMenuCheckboxItem key={c.id} checked={c.getIsVisible()} onCheckedChange={v => c.toggleVisibility(!!v)}>{c.id}</DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  key={c.id}
+                  className="capitalize"
+                  checked={c.getIsVisible()}
+                  onCheckedChange={v => c.toggleVisibility(!!v)}
+                >
+                  {c.id}
+                </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button size="sm"><IconPlus size={16} /> Ajouter</Button>
+          <Button size="sm"><IconPlus size={16} /> Add User</Button>
         </div>
       </div>
 
-      <TabsContent value="all" className="p-4">
+      <div className="p-4">
         <div className="border rounded-lg">
           <DndContext collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd} sensors={sensors}>
             <Table>
@@ -86,21 +119,31 @@ export function DataTable({ data: initialData }: { data: User[] }) {
               </TableHeader>
               <TableBody>
                 <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
-                  {table.getRowModel().rows.map(row => <DraggableRow key={row.id} row={row} />)}
+                  {table.getRowModel().rows.map(row => (
+                    <DraggableRow key={row.id} row={row} />
+                  ))}
                 </SortableContext>
+                {table.getRowModel().rows.length === 0 && (
+                  <TableRow>
+                    <td colSpan={columns.length} className="h-24 text-center">No users found.</td>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </DndContext>
         </div>
 
         <div className="flex items-center justify-between mt-4">
-          <div className="text-sm text-muted-foreground">{table.getFilteredSelectedRowModel().rows.length} sélectionné(s)</div>
+          <div className="text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
           <div className="flex gap-2">
             <Button variant="outline" size="icon" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}><IconChevronLeft /></Button>
             <Button variant="outline" size="icon" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}><IconChevronRight /></Button>
           </div>
         </div>
-      </TabsContent>
+      </div>
     </Tabs>
   );
 }

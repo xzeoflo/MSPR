@@ -1,5 +1,17 @@
 const API_URL = "http://localhost:8080/api/auth";
 
+export function getCurrentUser() {
+  if (typeof window === "undefined") return null;
+
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+}
+
+export function getAuthToken() {
+  const user = getCurrentUser();
+  return user ? user.token : null;
+}
+
 export async function loginClient(email: string, password: string) {
   const res = await fetch(`${API_URL}/login/admin`, {
     method: "POST",
@@ -13,22 +25,13 @@ export async function loginClient(email: string, password: string) {
     throw new Error("Email ou mot de passe incorrect");
   }
 
-  const user = await res.json();
-
-  localStorage.setItem("user", JSON.stringify(user));
-
-  return user;
-}
-
-export function getCurrentUser() {
-  if (typeof window === "undefined") return null;
-
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
+  const data = await res.json();
+  localStorage.setItem("user", JSON.stringify(data));
+  return data;
 }
 
 export function isAuthenticated() {
-  return !!getCurrentUser();
+  return !!getAuthToken();
 }
 
 export function logout() {

@@ -3,18 +3,24 @@
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/data-table";
 import { User } from "@/types/user";
+import { getAuthToken } from "@/lib/auth";
 
 export default function UsersPage() {
   const [data, setData] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
 
     const getUsers = async () => {
+      const token = getAuthToken();
       try {
-        const response = await fetch("http://127.0.0.1:8080/api/users", {
-          cache: "no-store",
+        const response = await fetch("http://localhost:8080/api/users", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
         });
 
         if (!response.ok) {
@@ -33,20 +39,21 @@ export default function UsersPage() {
 
     getUsers();
   }, []);
+
   if (!mounted) return null;
 
   return (
     <div className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Utilisateurs
+          Users
         </h1>
         <p className="text-muted-foreground">
           {loading
-            ? "Chargement des données..."
+            ? "Loading data..."
             : data.length > 0
-              ? `Gérez les membres de votre plateforme (${data.length} utilisateurs).`
-              : "Aucun utilisateur trouvé."}
+              ? `Manage your platform members (${data.length} users).`
+              : "No users found."}
         </p>
       </div>
       {!loading && <DataTable data={data} />}

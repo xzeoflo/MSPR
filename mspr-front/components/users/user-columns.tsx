@@ -36,13 +36,13 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "firstname",
-    header: "Utilisateur",
+    header: "User", // Translated
     cell: ({ row }) => <UserCellViewer item={row.original} />,
     enableHiding: false,
   },
   {
     accessorKey: "role",
-    header: "Rôle",
+    header: "Role", // Translated
     cell: ({ row }) => {
       const role = row.original.role;
       const variants: Record<string, string> = {
@@ -58,24 +58,26 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "birthday",
-    header: "Âge",
-    cell: ({ row }) => {
-      return <div className="font-medium">{birthday} {typeof birthday === 'number' ? 'ans' : ''}</div>;
-    },
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => (
+      <div className="text-sm italic text-muted-foreground">
+        {row.original.email}
+      </div>
+    ),
   },
   {
     accessorKey: "partnerBrand",
-    header: "Entreprise Partenaire",
+    header: "Partner Brand", // Translated
     cell: ({ row }) => (
       <div className="text-sm italic text-muted-foreground">
-        {row.original.partnerBrand || "Indépendant"}
+        {row.original.partnerBrand || "Independent"}
       </div>
     ),
   },
   {
     accessorKey: "subscriptionTier",
-    header: "Abonnement",
+    header: "Subscription", // Translated
     cell: ({ row }) => <Badge variant="outline">{row.original.subscriptionTier || "FREE"}</Badge>,
   },
   {
@@ -86,13 +88,13 @@ export const columns: ColumnDef<User>[] = [
           <Button variant="ghost" size="icon" className="size-8"><IconDotsVertical /></Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => console.log("Edit", row.original.id)}>Modifier</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => console.log("Edit", row.original.id)}>Edit</DropdownMenuItem> {/* Translated */}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-600 focus:text-red-600"
             onClick={() => console.log("Delete", row.original.id)}
           >
-            Supprimer
+            Delete {/* Translated */}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

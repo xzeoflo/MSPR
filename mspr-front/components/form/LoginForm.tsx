@@ -13,10 +13,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginClient } from "@/lib/auth";
+import { useState } from "react";
 
 export function LoginForm() {
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -25,8 +31,14 @@ export function LoginForm() {
     try {
       await loginClient(email, password);
       window.location.href = "/";
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Une erreur inattendue est survenue");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,6 +85,11 @@ export function LoginForm() {
 
         <CardFooter className="flex-col gap-2 pt-6">
           {" "}
+          {error && (
+            <p className="text-sm font-medium text-destructive mb-4 text-center">
+              {error}
+            </p>
+          )}
           <Button type="submit" className="w-full">
             Login
           </Button>
