@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.AuthenticationResponse;
 import com.example.demo.models.User;
 import com.example.demo.models.enums.SubscriptionTier;
 import com.example.demo.models.enums.UserRole;
@@ -16,12 +17,19 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService; // Ajouté pour générer les tokens
 
-    public AuthService(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository,
+                       UserValidator userValidator,
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
+
+    // --- INSCRIPTION ---
 
     public User registerAdmin(User user) {
         user.setRole(UserRole.ADMIN);
@@ -55,20 +63,26 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public User loginAdmin(String email, String password) {
+    // --- LOGIN AVEC GÉNÉRATION DE TOKEN ---
+
+    public AuthenticationResponse loginAdmin(String email, String password) {
         User user = authenticate(email, password);
         userValidator.verifyAdminAccess(user);
-        return user;
+        String token = jwtService.generateToken(user);
+        return new AuthenticationResponse(token);
     }
 
-    public User loginCoach(String email, String password) {
+    public AuthenticationResponse loginCoach(String email, String password) {
         User user = authenticate(email, password);
         userValidator.verifyCoachAccess(user);
-        return user;
+        String token = jwtService.generateToken(user);
+        return new AuthenticationResponse(token);
     }
 
-    public User loginClient(String email, String password) {
-        return authenticate(email, password);
+    public AuthenticationResponse loginClient(String email, String password) {
+        User user = authenticate(email, password);
+        String token = jwtService.generateToken(user);
+        return new AuthenticationResponse(token);
     }
 
     private User authenticate(String email, String password) {

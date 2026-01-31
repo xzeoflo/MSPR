@@ -30,24 +30,23 @@
 # 3. BACK-END (mspr-back - Java/Maven ou Gradle)
 # --------------------------------------------------------------------
 # Fichiers compilés, binaires et build
-/mspr-back/target/      # Pour Maven (fichiers .class et packages)
-/mspr-back/build/       # Pour Gradle ou autres outils
-/mspr-back/*.jar
-/mspr-back/*.war
-/mspr-back/*.zip
+/demo/target/      # Pour Maven (fichiers .class et packages)
+/demo/build/       # Pour Gradle ou autres outils
+/demo/*.jar
+/demo/*.war
+/demo/*.
 .idea/
 demo/.idea/
 demo/target/
-demo/*.jar
-demo/*.war
-.DS_Store
+*.class
+*.jar
 
 # Fichiers d'IDE (Exemples : IntelliJ, Eclipse, VS Code)
-/mspr-back/.idea/
-/mspr-back/*.iws
-/mspr-back/*.iml
-/mspr-back/.settings/
-/mspr-back/.vscode/
+/demo/.idea/
+/demo/*.iws
+/demo/*.iml
+/demo/.settings/
+/demo/.vscode/
 
 # 4. MISCELLANÉES & ENVRONNEMENT
 # --------------------------------------------------------------------

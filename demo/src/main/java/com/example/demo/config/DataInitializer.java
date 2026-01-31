@@ -27,9 +27,9 @@ public class DataInitializer {
                 admin.setSubscriptionTier(SubscriptionTier.PREMIUM_PLUS);
 
                 userRepository.save(admin);
-                System.out.println("✅ COMPTE ADMIN CRÉÉ : admin@healthai.fr / Admin@flo123");
+                System.out.println("COMPTE ADMIN CRÉÉ : admin@healthai.fr / Admin@flo123");
             } else {
-                System.out.println("ℹ️ Compte admin déjà présent en base.");
+                System.out.println("Compte admin déjà présent en base.");
             }
         };
     }

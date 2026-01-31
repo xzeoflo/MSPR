@@ -3,11 +3,24 @@ package com.example.demo.models;
 import com.example.demo.models.enums.SubscriptionTier;
 import com.example.demo.models.enums.UserRole;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User {
+@Getter
+@Setter
+@NoArgsConstructor
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +47,13 @@ public class User {
     @Column(name = "subscription_tier")
     private SubscriptionTier subscriptionTier;
 
-    public User() {
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "user_workouts",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "workout_id")
+    )
+    private List<Workout> completedWorkouts = new ArrayList<>();
 
     public User(String email, String password, String firstname, UserRole role) {
         this.email = email;
@@ -45,30 +63,33 @@ public class User {
         this.subscriptionTier = SubscriptionTier.FREEMIUM;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-    public String getFirstname() { return firstname; }
-    public void setFirstname(String firstname) { this.firstname = firstname; }
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-    public String getLastname() { return lastname; }
-    public void setLastname(String lastname) { this.lastname = lastname; }
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-    public LocalDate getBirthday() { return birthday; }
-    public void setBirthday(LocalDate birthday) { this.birthday = birthday; }
-
-    public String getPartnerBrand() { return partnerBrand; }
-    public void setPartnerBrand(String partnerBrand) { this.partnerBrand = partnerBrand; }
-
-    public UserRole getRole() { return role; }
-    public void setRole(UserRole role) { this.role = role; }
-
-    public SubscriptionTier getSubscriptionTier() { return subscriptionTier; }
-    public void setSubscriptionTier(SubscriptionTier subscriptionTier) { this.subscriptionTier = subscriptionTier; }
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
