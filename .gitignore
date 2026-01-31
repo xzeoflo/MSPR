@@ -35,6 +35,12 @@
 /mspr-back/*.jar
 /mspr-back/*.war
 /mspr-back/*.zip
+.idea/
+demo/.idea/
+demo/target/
+demo/*.jar
+demo/*.war
+.DS_Store
 
 # Fichiers d'IDE (Exemples : IntelliJ, Eclipse, VS Code)
 /mspr-back/.idea/
