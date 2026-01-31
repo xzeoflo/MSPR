@@ -34,7 +34,12 @@
 /demo/build/       # Pour Gradle ou autres outils
 /demo/*.jar
 /demo/*.war
-/demo/*.zip
+/demo/*.
+.idea/
+demo/.idea/
+demo/target/
+*.class
+*.jar
 
 # Fichiers d'IDE (Exemples : IntelliJ, Eclipse, VS Code)
 /demo/.idea/
