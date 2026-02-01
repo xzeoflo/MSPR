@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { DataTable } from "@/components/data-table";
-import { User } from "@/types/user";
+import { columns } from "@/components/exercises/exercise-columns";
 import { getAuthToken } from "@/lib/auth";
-import { columns } from "@/components/users/user-columns";
+import { Exercise } from "@/types/exercise";
 import { IconAlertCircle, IconLoader2 } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 
-export default function UsersPage() {
-  const [data, setData] = useState<User[]>([]);
+export default function ExercisesPage() {
+  const [data, setData] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,14 +16,14 @@ export default function UsersPage() {
   useEffect(() => {
     setMounted(true);
 
-    const getUsers = async () => {
+    const getWorkouts = async () => {
       const token = getAuthToken();
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:8080/api/users", {
+        const response = await fetch("http://localhost:8080/api/exercices", {
           headers: {
             "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
         });
 
@@ -37,51 +37,46 @@ export default function UsersPage() {
           const jsonData = JSON.parse(rawText);
           setData(Array.isArray(jsonData) ? jsonData : []);
           setError(null);
-        } catch (parseErr: unknown) {
-          console.error("JSON Parse Error Details:", parseErr);
-          console.error("Raw text received:", rawText);
+        } catch (parseError) {
+          console.error("JSON Parse Error Details:", parseError);
+          console.error("Raw text received from server:", rawText);
           throw new Error("Invalid JSON format. Check for circular references in Backend.");
         }
 
       } catch (err: unknown) {
-        let message = "An unknown error occurred";
-        if (err instanceof Error) message = err.message;
-
-        console.error("[Fetch Error]:", message);
-        setError(message);
+        const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+        console.error("[Fetch Error]:", errorMessage);
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
     };
 
-    getUsers();
+    getWorkouts();
   }, []);
-
-  if (!mounted) return null;
-
   return (
     <div className="flex flex-1 flex-col p-4 md:p-6 lg:p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Users
+            Exercises
           </h1>
           <p className="text-muted-foreground text-sm">
             {loading
-              ? "Loading members..."
+              ? "Loading sessions..."
               : error
                 ? "Error loading data"
-                : `Manage your platform members (${data.length} users).`}
+                : `Manage your training programs (${data.length} sessions).`}
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-500/50 bg-red-500/10 p-4 text-red-600 flex items-start gap-3">
-          <IconAlertCircle className="h-5 w-5 mt-0.5" />
-          <div className="flex-1">
-            <h3 className="font-bold leading-none mb-1">API Error</h3>
-            <p className="text-sm opacity-90">{error}</p>
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive flex items-center gap-3">
+          <IconAlertCircle className="h-4 w-4" />
+          <div>
+            <p className="font-bold">API Error</p>
+            <p className="text-sm">{error}</p>
           </div>
         </div>
       )}
@@ -92,15 +87,9 @@ export default function UsersPage() {
         </div>
       ) : (
         !error && (
-          <DataTable<User>
-            data={data}
+          <DataTable<Exercise>
             columns={columns}
-            filterColumn="role"
-            filters={[
-              { label: "Admins", value: "admin" },
-              { label: "Coaches", value: "coach" },
-              { label: "Clients", value: "client" }
-            ]}
+            data={data}
           />
         )
       )}

@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { DragHandle } from "./drag-handle";
+import { DragHandle } from "../drag-handle";
 import { UserCellViewer } from "./user-cell-viewer";
 
 export const columns: ColumnDef<User>[] = [
@@ -36,13 +36,13 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "firstname",
-    header: "User", // Translated
+    header: "User",
     cell: ({ row }) => <UserCellViewer item={row.original} />,
     enableHiding: false,
   },
   {
     accessorKey: "role",
-    header: "Role", // Translated
+    header: "Role",
     cell: ({ row }) => {
       const role = row.original.role;
       const variants: Record<string, string> = {
@@ -68,7 +68,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "partnerBrand",
-    header: "Partner Brand", // Translated
+    header: "Partner Brand",
     cell: ({ row }) => (
       <div className="text-sm italic text-muted-foreground">
         {row.original.partnerBrand || "Independent"}
@@ -77,7 +77,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "subscriptionTier",
-    header: "Subscription", // Translated
+    header: "Subscription",
     cell: ({ row }) => <Badge variant="outline">{row.original.subscriptionTier || "FREE"}</Badge>,
   },
   {
@@ -88,13 +88,13 @@ export const columns: ColumnDef<User>[] = [
           <Button variant="ghost" size="icon" className="size-8"><IconDotsVertical /></Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => console.log("Edit", row.original.id)}>Edit</DropdownMenuItem> {/* Translated */}
+          <DropdownMenuItem onClick={() => console.log("Edit", row.original.id)}>Edit</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-600 focus:text-red-600"
             onClick={() => console.log("Delete", row.original.id)}
           >
-            Delete {/* Translated */}
+            Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

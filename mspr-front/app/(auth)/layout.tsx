@@ -15,7 +15,7 @@ export default function AuthLayout({
               <Rat size={32} />
             </div>
             <span className="text-2xl font-black tracking-tighter text-foreground pr-4">
-              MSPR
+              HealthAI
             </span>
           </div>
         </div>

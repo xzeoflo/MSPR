@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -13,11 +12,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginClient } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,14 +31,10 @@ export function LoginForm() {
 
     try {
       await loginClient(email, password);
-      window.location.href = "/";
+      router.push("/");
+      router.refresh();
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Une erreur inattendue est survenue");
-      }
-    } finally {
+      setError(err instanceof Error ? err.message : "Identifiants invalides");
       setIsLoading(false);
     }
   };
@@ -49,9 +46,6 @@ export function LoginForm() {
         <CardDescription>
           Enter your email below to login to your account
         </CardDescription>
-        <CardAction>
-          <Button variant="link">Sign Up</Button>
-        </CardAction>
       </CardHeader>
 
       <form onSubmit={onSubmit}>

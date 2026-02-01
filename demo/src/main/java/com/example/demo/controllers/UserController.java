@@ -33,10 +33,11 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<User> getMyProfile(Principal principal) {
-        if (principal instanceof Authentication authentication) {
-            return ResponseEntity.ok((User) authentication.getPrincipal());
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.status(401).build();
+        User user = userService.getUserByEmail(principal.getName(), null);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping
@@ -62,7 +63,8 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
-    public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User userDetails, Principal principal) {
+    public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User userDetails,
+            Principal principal) {
         String brand = getRequestingUserPartner(principal);
         return ResponseEntity.ok(userService.updateUser(id, userDetails, brand));
     }
@@ -79,8 +81,7 @@ public class UserController {
                 id,
                 passwords.get("oldPassword"),
                 passwords.get("newPassword"),
-                brand
-        );
+                brand);
         return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
     }
 
