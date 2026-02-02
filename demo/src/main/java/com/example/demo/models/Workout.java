@@ -1,5 +1,7 @@
 package com.example.demo.models;
 
+import com.example.demo.models.enums.Intensity;
+import com.example.demo.models.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +21,9 @@ public class Workout {
     private String title;
     private String description;
     private String difficulty;
-    private String workoutType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Intensity workoutType;
 
     @Column(name = "partner_brand")
     private String partnerBrand;

@@ -66,6 +66,33 @@ public class WorkoutService {
         return workoutRepository.save(workout);
     }
 
+    @Transactional
+    public Workout updateWorkout(Integer id, Workout details, String userBrand, String role) {
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Workout not found"));
+
+        if (!role.equals("ADMIN") && !workout.getPartnerBrand().equals(userBrand)) {
+            throw new RuntimeException("Access Denied: Brand mismatch");
+        }
+
+        workout.setTitle(details.getTitle());
+        workout.setDescription(details.getDescription());
+        workout.setDifficulty(details.getDifficulty());
+        workout.setWorkoutType(details.getWorkoutType());
+        return workoutRepository.save(workout);
+    }
+
+    @Transactional
+    public void deleteWorkout(Integer id, String userBrand, String role) {
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Workout not found"));
+
+        if (!role.equals("ADMIN") && !workout.getPartnerBrand().equals(userBrand)) {
+            throw new RuntimeException("Access Denied: Brand mismatch");
+        }
+        workoutRepository.delete(workout);
+    }
+
     public List<Workout> getWorkoutsByAgeRange(int minAge, int maxAge, String requestingUserPartnerBrand) {
         List<User> users;
         if (requestingUserPartnerBrand == null) {

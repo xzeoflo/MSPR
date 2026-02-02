@@ -17,7 +17,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService; // Ajouté pour générer les tokens
+    private final JwtService jwtService;
 
     public AuthService(UserRepository userRepository,
                        UserValidator userValidator,
@@ -29,7 +29,6 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    // --- INSCRIPTION ---
 
     public User registerAdmin(User user) {
         user.setRole(UserRole.ADMIN);
@@ -63,7 +62,6 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    // --- LOGIN AVEC GÉNÉRATION DE TOKEN ---
 
     public AuthenticationResponse loginAdmin(String email, String password) {
         User user = authenticate(email, password);
