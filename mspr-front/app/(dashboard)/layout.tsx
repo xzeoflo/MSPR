@@ -1,28 +1,32 @@
-// app/(dashboard)/layout.tsx
-import Sidebar from '@/components/ui/layout/Sidebar';
-import Header from '@/components/ui/layout/Header';
-import Footer from '@/components/ui/layout/Footer';
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      <Header />
-      <div className="flex flex-1">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto flex flex-col">
-          <div className="flex-1 p-6 md:p-10">
-            {children}
-          </div>
-          <Footer />
-        </main>
-
-      </div>
-
-    </div>
-  )
+    <html lang="fr" className="dark">
+      <body>
+        <SidebarProvider
+          style={
+            {
+              "--sidebar-width": "calc(var(--spacing) * 72)",
+              "--header-height": "calc(var(--spacing) * 12)",
+            } as React.CSSProperties
+          }
+        >
+          <AppSidebar variant="inset" />
+          <SidebarInset>
+            <SiteHeader />
+            <div className="flex flex-1 flex-col p-6 space-y-6 overflow-y-auto">
+              <div className="mx-auto w-full max-w-7xl">{children}</div>
+            </div>
+          </SidebarInset>
+        </SidebarProvider>
+      </body>
+    </html>
+  );
 }
