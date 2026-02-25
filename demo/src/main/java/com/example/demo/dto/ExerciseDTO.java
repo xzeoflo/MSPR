@@ -1,8 +1,9 @@
 package com.example.demo.dto;
 
+import com.example.demo.models.enums.Intensity;
+
 import jakarta.validation.constraints.*;
 import lombok.Data;
-
 
 @Data
 public class ExerciseDTO {
@@ -24,8 +25,8 @@ public class ExerciseDTO {
     @PositiveOrZero(message = "calories must be positive")
     private Integer caloriesBurned = 0;
 
-    @Pattern(regexp = "^(Low|Medium|High|Very High)$", message = "Intensity invalid")
-    private String intensityLevel;
+    @Pattern(regexp = "^(BEGINNER|INTERMEDIATE|ADVANCED|NIGHTMARE)$", message = "Intensity must be BEGINNER, INTERMEDIATE, ADVANCED or NIGHTMARE")
+    private Intensity intensityLevel;
 
     @NotBlank(message = "exerciseType is required")
     private String exerciseType;
