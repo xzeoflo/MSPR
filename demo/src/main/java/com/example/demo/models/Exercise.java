@@ -1,7 +1,6 @@
 package com.example.demo.models;
 
-import com.example.demo.models.enums.Intensity;
-import com.example.demo.models.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,5 +32,6 @@ public class Exercise {
 
     @ManyToOne
     @JoinColumn(name = "workout_id")
+    @JsonBackReference
     private Workout workout;
 }

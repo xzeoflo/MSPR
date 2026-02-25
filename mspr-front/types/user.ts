@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const userSchema = z.object({
   id: z.number(),
-  email: z.string().email("Format email invalide"),
+  email: z.email("Format email invalide"),
   firstname: z.string().min(1, "Le prénom est requis"),
   lastname: z.string().optional().nullable(),
   birthday: z.string().optional().nullable(),
@@ -12,4 +12,3 @@ export const userSchema = z.object({
 });
 
 export type User = z.infer<typeof userSchema>;
-}
