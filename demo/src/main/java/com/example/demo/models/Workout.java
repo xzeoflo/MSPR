@@ -20,7 +20,9 @@ public class Workout {
     private String title;
     private String description;
     private String difficulty;
-    private String workoutType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Intensity workoutType;
 
     @Column(name = "partner_brand")
     private String partnerBrand;

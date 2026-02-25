@@ -57,6 +57,21 @@ public class WorkoutController {
         return ResponseEntity.ok(workoutService.createWorkout(workout, brand));
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
+    public ResponseEntity<Workout> update(@PathVariable Integer id, @RequestBody Workout workout, Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return ResponseEntity.ok(workoutService.updateWorkout(id, workout, user.getPartnerBrand(), user.getRole().name()));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
+    public ResponseEntity<Void> delete(@PathVariable Integer id, Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        workoutService.deleteWorkout(id, user.getPartnerBrand(), user.getRole().name());
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/stats/age")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<List<Workout>> getWorkoutsByAgeStats(
