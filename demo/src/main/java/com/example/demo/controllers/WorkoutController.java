@@ -97,7 +97,7 @@ public class WorkoutController {
             @RequestParam String level,
             Principal principal) {
         String brand = getRequestingUserPartner(principal);
-        return ResponseEntity.ok(workoutService.getWorkoutsByDifficulty(level, brand));
+        return ResponseEntity.ok(workoutService.getWorkoutsIntensity(level, brand));
     }
 
     @GetMapping("/history/{userId}")
@@ -132,7 +132,7 @@ public class WorkoutController {
             @RequestParam String exerciseType,
             Principal principal) {
         String brand = getRequestingUserPartner(principal);
-        return ResponseEntity.ok(workoutService.getPureWorkouts(workoutType, exerciseType, brand));
+        return ResponseEntity.ok(workoutService.getWorkoutByTypeAndIntensity(workoutType, exerciseType, brand));
     }
 
     @GetMapping("/export")

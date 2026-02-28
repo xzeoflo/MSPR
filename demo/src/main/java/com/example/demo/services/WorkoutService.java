@@ -51,13 +51,13 @@ public class WorkoutService {
         workout.setPartnerBrand(requestingUserPartnerBrand);
 
         if (workout.getExercises() != null && !workout.getExercises().isEmpty()) {
-            String expectedType = workout.getWorkoutType();
+            String expectedIntensity = workout.getWorkoutIntensity().toString();
 
             for (Exercise exercise : workout.getExercises()) {
-                if (expectedType != null && !expectedType.equalsIgnoreCase(exercise.getExerciseType())) {
+                if (expectedIntensity != null && !expectedIntensity.equalsIgnoreCase(exercise.getIntensityLevel().toString())) {
                     throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST,
-                            "Incohérence de type : L'exercice '" + exercise.getName() + "' est de type [" + exercise.getExerciseType() + "] mais le workout est de type [" + expectedType + "]."
+                            "Incohérence de type : L'exercice '" + exercise.getName() + "' est d'intensité [" + exercise.getIntensityLevel().toString() + "] mais le workout est d'intensité [" + expectedIntensity + "]."
                     );
                 }
                 exercise.setWorkout(workout);
@@ -78,7 +78,7 @@ public class WorkoutService {
         workout.setTitle(details.getTitle());
         workout.setDescription(details.getDescription());
         workout.setDifficulty(details.getDifficulty());
-        workout.setWorkoutType(details.getWorkoutType());
+        workout.setWorkoutIntensity(details.getWorkoutIntensity());
         return workoutRepository.save(workout);
     }
 
@@ -126,30 +126,30 @@ public class WorkoutService {
                 .collect(Collectors.toList());
     }
 
-    public List<Workout> getWorkoutsByDifficulty(String difficulty, String requestingUserPartnerBrand) {
+    public List<Workout> getWorkoutsIntensity(String intensity, String requestingUserPartnerBrand) {
         return getAllWorkouts(requestingUserPartnerBrand).stream()
-                .filter(w -> w.getDifficulty().equalsIgnoreCase(difficulty))
+                .filter(w -> w.getWorkoutIntensity().toString().equalsIgnoreCase(intensity))
                 .collect(Collectors.toList());
     }
 
     public List<Workout> getWorkoutsByType(String type, String requestingUserPartnerBrand) {
         return getAllWorkouts(requestingUserPartnerBrand).stream()
-                .filter(w -> w.getWorkoutType() != null && w.getWorkoutType().equalsIgnoreCase(type))
+                .filter(w -> w.getWorkoutIntensity() != null && w.getWorkoutIntensity().toString().equalsIgnoreCase(type))
                 .collect(Collectors.toList());
     }
 
     public List<Workout> getWorkoutsByExerciseType(String exerciseType, String requestingUserPartnerBrand) {
         return getAllWorkouts(requestingUserPartnerBrand).stream()
                 .filter(w -> w.getExercises().stream()
-                        .anyMatch(e -> e.getExerciseType() != null && e.getExerciseType().equalsIgnoreCase(exerciseType)))
+                        .anyMatch(e -> e.getExerciseType() != null && e.getExerciseType().toString().equalsIgnoreCase(exerciseType)))
                 .collect(Collectors.toList());
     }
 
-    public List<Workout> getPureWorkouts(String workoutType, String exerciseType, String requestingUserPartnerBrand) {
+    public List<Workout> getWorkoutByTypeAndIntensity(String workoutType, String exerciseType, String requestingUserPartnerBrand) {
         return getAllWorkouts(requestingUserPartnerBrand).stream()
-                .filter(w -> w.getWorkoutType() != null && w.getWorkoutType().equalsIgnoreCase(workoutType))
+                .filter(w -> w.getWorkoutIntensity() != null && w.getWorkoutIntensity().toString().equalsIgnoreCase(workoutType))
                 .filter(w -> w.getExercises().stream()
-                        .allMatch(e -> e.getExerciseType() != null && e.getExerciseType().equalsIgnoreCase(exerciseType)))
+                        .allMatch(e -> e.getExerciseType()!= null && e.getExerciseType().toString().equalsIgnoreCase(exerciseType)))
                 .collect(Collectors.toList());
     }
 
@@ -177,9 +177,9 @@ public class WorkoutService {
 
     private void validateWorkoutCoherence(Workout workout) {
         if (workout.getExercises() != null) {
-            String expectedType = workout.getWorkoutType();
+            String expectedIntensity = workout.getWorkoutIntensity().toString();
             workout.getExercises().forEach(ex -> {
-                if (expectedType != null && !expectedType.equalsIgnoreCase(ex.getExerciseType())) {
+                if (expectedIntensity != null && !expectedIntensity.equalsIgnoreCase(ex.getIntensityLevel().toString())) {
                     throw new IllegalArgumentException("Type mismatch for exercise: " + ex.getName());
                 }
             });

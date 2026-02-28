@@ -21,7 +21,7 @@ public class WorkoutMapper {
         dto.setTitle(entity.getTitle());
         dto.setDescription(entity.getDescription());
         dto.setDifficulty(entity.getDifficulty());
-        dto.setWorkoutType(entity.getWorkoutType());
+        dto.setWorkoutType(entity.getWorkoutIntensity());
         dto.setPartnerBrand(entity.getPartnerBrand());
 
         dto.setTotalCalories(entity.getTotalCaloriesBurned());
@@ -41,7 +41,7 @@ public class WorkoutMapper {
         workout.setTitle(dto.getTitle() != null ? dto.getTitle() : "Nouveau Workout");
         workout.setDescription(dto.getDescription());
         workout.setDifficulty(dto.getDifficulty() != null ? dto.getDifficulty() : "Intermediate");
-        workout.setWorkoutType(dto.getWorkoutType());
+        workout.setWorkoutIntensity(dto.getWorkoutType());
         workout.setPartnerBrand(dto.getPartnerBrand());
 
         if (dto.getExercises() != null && !dto.getExercises().isEmpty()) {

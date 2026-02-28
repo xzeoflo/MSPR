@@ -1,9 +1,11 @@
 package com.example.demo.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.example.demo.models.enums.Intensity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "exercises")
@@ -26,12 +28,12 @@ public class Exercise {
     @Column(nullable = false)
     private Intensity intensityLevel;
 
-    private String exerciseType;
+    private List<String> exerciseType;
+    private List<String> exerciseEquipments;
 
     private Integer sequenceOrder;
 
     @ManyToOne
     @JoinColumn(name = "workout_id")
-    @JsonBackReference
     private Workout workout;
 }
