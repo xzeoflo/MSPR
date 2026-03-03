@@ -5,21 +5,14 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("auth-token")?.value;
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/" && !token) {
+  const isPublicRoute = pathname === "/login" || pathname === "/register";
+
+  if (!token && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (token && (pathname === "/login" || pathname === "/register")) {
+  if (token && isPublicRoute) {
     return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  const isProtectedRoute =
-    pathname.startsWith("/exercises") ||
-    pathname.startsWith("/users") ||
-    pathname.startsWith("/workouts");
-
-  if (!token && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();

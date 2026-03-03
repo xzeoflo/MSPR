@@ -142,9 +142,6 @@ export const columns: ColumnDef<Workout>[] = [
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <WorkoutCellViewer item={row.original} />
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => console.log("Stats", row.original.id)}>
             Statistics
           </DropdownMenuItem>

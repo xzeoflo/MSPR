@@ -20,7 +20,7 @@ export default function ExercisesPage() {
       const token = getAuthToken();
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:8080/api/exercices", {
+        const response = await fetch("http://localhost:8080/api/exercises", {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -88,8 +88,15 @@ export default function ExercisesPage() {
       ) : (
         !error && (
           <DataTable<Exercise>
-            columns={columns}
             data={data}
+            columns={columns}
+            filterColumn="intensityLevel"
+            filters={[
+              { label: "Beginner", value: "BEGINNER" },
+              { label: "Intermediate", value: "INTERMEDIATE" },
+              { label: "Advanced", value: "ADVANCED" },
+              { label: "Nightmare", value: "NIGHTMARE" },
+            ]}
           />
         )
       )}
