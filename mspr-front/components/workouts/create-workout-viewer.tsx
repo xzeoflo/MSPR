@@ -25,6 +25,7 @@ import {
   DrawerTitle,
   DrawerPortal
 } from "@/components/ui/drawer";
+import { Trash2 } from "lucide-react";
 
 interface Exercise {
   id: number;
@@ -147,11 +148,15 @@ export function CreateWorkoutViewer({ open, setOpen, onWorkoutCreated }: { open:
                   <Textarea id="description" name="description" required placeholder="Describe the workout..." className="resize-none" />
                 </div>
 
+                <Separator />
+
                 <div className="space-y-2">
                   <Label htmlFor="partnerBrand">Partner Brand</Label>
                   <Input id="partnerBrand" name="partnerBrand" placeholder="ex: BasicFit (Leave empty if none)" />
                 </div>
               </div>
+
+              <Separator />
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -201,24 +206,41 @@ export function CreateWorkoutViewer({ open, setOpen, onWorkoutCreated }: { open:
                   </SelectContent>
                 </Select>
 
-                <div className="space-y-2 mt-4">
-                  {selectedExercises.map((ex, idx) => (
-                    <div key={`${ex.id}-${idx}`} className="flex items-center justify-between border p-3 rounded-lg bg-accent/50 group">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-xs">{ex.name}</span>
-                        <span className="text-[10px] text-muted-foreground">{ex.durationInSeconds} seconds</span>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
-                        onClick={() => setSelectedExercises(prev => prev.filter((_, i) => i !== idx))}
+                <div className="space-y-2 border rounded-lg p-2 bg-muted/30">
+                  {selectedExercises.length > 0 ? (
+                    selectedExercises.map((ex, idx) => (
+                      <div
+                        key={`${ex.id}-${idx}`}
+                        className="flex items-center justify-between gap-2 bg-background p-2 rounded border shadow-sm group"
                       >
-                        ✕
-                      </Button>
-                    </div>
-                  ))}
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-col">
+                            <span className="font-medium text-xs">
+                              {idx + 1}. {ex.name}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {ex.durationInSeconds}s - {ex.exerciseType}
+                            </span>
+                          </div>
+                        </div>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          // Utilisation des classes d'opacité au survol du parent (group)
+                          className="h-7 w-7 opacity-0 group-hover:opacity-100 text-destructive transition-opacity hover:bg-destructive/10"
+                          onClick={() => setSelectedExercises(prev => prev.filter((_, i) => i !== idx))}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center py-4 text-muted-foreground text-xs italic">
+                      No exercises in this workout.
+                    </p>
+                  )}
                 </div>
               </div>
             </form>

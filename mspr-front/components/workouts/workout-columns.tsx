@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Workout } from "@/types/workout";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
   IconClock,
@@ -14,7 +13,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
@@ -24,10 +22,13 @@ import { useState } from "react";
 import { getAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
 
-const ActionCell = ({ workout }: { workout: Workout }) => {
+// On passe fetchWorkouts à l'ActionCell pour éviter le reload()
+const ActionCell = ({ workout, onRefresh }: { workout: Workout; onRefresh: () => void }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
+    if (!confirm(`Are you sure you want to delete "${workout.title}"?`)) return;
+
     setIsDeleting(true);
     const token = getAuthToken();
 
@@ -41,7 +42,7 @@ const ActionCell = ({ workout }: { workout: Workout }) => {
 
       if (response.ok) {
         toast.success(`Workout "${workout.title}" deleted`);
-        window.location.reload();
+        onRefresh(); // Refresh fluide de la DataTable
       } else {
         toast.error("Failed to delete workout");
       }
@@ -71,7 +72,8 @@ const ActionCell = ({ workout }: { workout: Workout }) => {
   );
 };
 
-export const columns: ColumnDef<Workout>[] = [
+// Exportation sous forme de fonction pour injecter le rafraîchissement
+export const getColumns = (fetchWorkouts: () => void): ColumnDef<Workout>[] => [
   {
     id: "drag",
     header: () => null,
@@ -84,7 +86,12 @@ export const columns: ColumnDef<Workout>[] = [
   {
     accessorKey: "title",
     header: "Workout",
-    cell: ({ row }) => <WorkoutCellViewer item={row.original} />,
+    cell: ({ row }) => (
+      <WorkoutCellViewer
+        item={row.original}
+        onWorkoutUpdated={fetchWorkouts} // L'update refresh maintenant la table
+      />
+    ),
   },
   {
     accessorKey: "difficulty",
@@ -95,20 +102,11 @@ export const columns: ColumnDef<Workout>[] = [
 
       let variantClasses = "";
       switch (difficulty) {
-        case "BEGINNER":
-          variantClasses = "bg-emerald-700 border-emerald-700";
-          break;
-        case "INTERMEDIATE":
-          variantClasses = "bg-yellow-700 border-yellow-700";
-          break;
-        case "ADVANCED":
-          variantClasses = "bg-red-700 border-red-700";
-          break;
-        case "NIGHTMARE":
-          variantClasses = "bg-purple-700 border-purple-700";
-          break;
-        default:
-          variantClasses = "bg-slate-700 border-slate-700";
+        case "BEGINNER": variantClasses = "bg-emerald-700 border-emerald-700"; break;
+        case "INTERMEDIATE": variantClasses = "bg-yellow-700 border-yellow-700"; break;
+        case "ADVANCED": variantClasses = "bg-red-700 border-red-700"; break;
+        case "NIGHTMARE": variantClasses = "bg-purple-700 border-purple-700"; break;
+        default: variantClasses = "bg-slate-700 border-slate-700";
       }
 
       return (
@@ -124,7 +122,6 @@ export const columns: ColumnDef<Workout>[] = [
     header: "Duration",
     cell: ({ row }) => {
       const totalSeconds: number = row.original.totalDurationInSeconds ?? 0;
-
       const formatDuration = (seconds: number) => {
         if (seconds === 0) return "0s";
         const h = Math.floor(seconds / 3600);
@@ -148,9 +145,7 @@ export const columns: ColumnDef<Workout>[] = [
     header: "Category",
     cell: ({ row }) => (
       <div className="flex flex-col gap-0">
-        <span className="text-sm font-medium leading-tight">
-          {row.original.workoutType}
-        </span>
+        <span className="text-sm font-medium leading-tight">{row.original.workoutType}</span>
         <span className="text-[10px] text-muted-foreground italic leading-tight">
           {row.original.exerciseType}
         </span>
@@ -168,6 +163,6 @@ export const columns: ColumnDef<Workout>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <ActionCell workout={row.original} />,
+    cell: ({ row }) => <ActionCell workout={row.original} onRefresh={fetchWorkouts} />,
   },
 ];

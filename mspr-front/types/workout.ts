@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { exerciseSchema } from "./exercise"; // Importe le schéma de l'exercice
 
 export const workoutSchema = z.object({
   id: z.number().optional(),
@@ -7,6 +8,7 @@ export const workoutSchema = z.object({
   totalDurationInSeconds: z.number().optional(),
   difficulty: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]),
   workoutType: z.string().min(1, "Le type de workout est requis"), // Java: workoutType
+  exercises: z.array(exerciseSchema).default([]),
   exerciseType: z.string().optional(), // Peut être null selon ton entité
   partnerBrand: z.string().optional().nullable(),
   createdAt: z.string().optional(),

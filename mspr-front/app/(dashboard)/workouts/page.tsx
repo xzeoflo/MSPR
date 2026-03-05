@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { DataTable } from "@/components/data-table";
 import { Workout } from "@/types/workout";
-import { columns } from "@/components/workouts/workout-columns";
+import { getColumns } from "@/components/workouts/workout-columns";
 import { getAuthToken } from "@/lib/auth";
 import { IconAlertCircle, IconLoader2, IconPlus } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -39,13 +39,11 @@ export default function WorkoutsPage() {
         setError(null);
       } catch (parseError) {
         console.error("JSON Parse Error Details:", parseError);
-        console.error("Raw text received from server:", rawText);
-        throw new Error("Invalid JSON format. Check for circular references in Backend.");
+        throw new Error("Invalid JSON format.");
       }
 
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
-      console.error("[Fetch Error]:", errorMessage);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -57,7 +55,10 @@ export default function WorkoutsPage() {
     fetchWorkouts();
   }, []);
 
+  const columns = useMemo(() => getColumns(fetchWorkouts), []);
+
   if (!mounted) return null;
+
   return (
     <div className="flex flex-1 flex-col p-4 md:p-6 lg:p-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -85,7 +86,7 @@ export default function WorkoutsPage() {
         </div>
       )}
 
-      {loading ? (
+      {loading && data.length === 0 ? (
         <div className="flex h-64 items-center justify-center">
           <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -107,6 +108,7 @@ export default function WorkoutsPage() {
                 onWorkoutCreated={fetchWorkouts}
               />
             </div>
+
             <DataTable<Workout>
               data={data}
               columns={columns}
