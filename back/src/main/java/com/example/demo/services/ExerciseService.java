@@ -25,6 +25,14 @@ public class ExerciseService {
         return exerciseRepository.save(exercise);
     }
 
+    public List<Exercise> getAll(String userBrand, String role) {
+        if ("ADMIN".equals(role)) {
+            return exerciseRepository.findAll();
+        } else {
+            return exerciseRepository.findByWorkout_PartnerBrand(userBrand);
+        }
+    }
+
     public List<Exercise> getByWorkout(Integer workoutId, String userBrand, String role) {
         Workout workout = workoutRepository.findById(workoutId)
                 .orElseThrow(() -> new RuntimeException("Workout not found"));

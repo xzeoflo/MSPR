@@ -70,20 +70,6 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => <DragHandle id={row.original.id} />,
   },
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     accessorKey: "firstname",
     header: "User",
     cell: ({ row }) => <UserCellViewer item={row.original} />,

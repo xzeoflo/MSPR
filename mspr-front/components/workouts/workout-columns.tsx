@@ -8,6 +8,7 @@ import {
   IconClock,
   IconDotsVertical,
   IconFlame,
+  IconLoader2,
 } from "@tabler/icons-react";
 import {
   DropdownMenu,
@@ -19,6 +20,56 @@ import {
 
 import { WorkoutCellViewer } from "./workout-cell-viewer";
 import { DragHandle } from "../drag-handle";
+import { useState } from "react";
+import { getAuthToken } from "@/lib/auth";
+import { toast } from "sonner";
+
+const ActionCell = ({ workout }: { workout: Workout }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const token = getAuthToken();
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/workouts/${workout.id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        toast.success(`Workout "${workout.title}" deleted`);
+        window.location.reload();
+      } else {
+        toast.error("Failed to delete workout");
+      }
+    } catch (err) {
+      toast.error("Network error while deleting");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="size-8" disabled={isDeleting}>
+          {isDeleting ? <IconLoader2 className="animate-spin size-4" /> : <IconDotsVertical className="size-4" />}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          className="text-red-600 focus:text-red-600 font-medium"
+          onClick={handleDelete}
+        >
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 export const columns: ColumnDef<Workout>[] = [
   {
@@ -26,25 +77,9 @@ export const columns: ColumnDef<Workout>[] = [
     header: () => null,
     cell: ({ row }) => {
       const id = row.original.id;
-
       if (id === undefined) return null;
-
       return <DragHandle id={id} />;
     },
-  },
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
-    ),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
     accessorKey: "title",
@@ -92,7 +127,6 @@ export const columns: ColumnDef<Workout>[] = [
 
       const formatDuration = (seconds: number) => {
         if (seconds === 0) return "0s";
-
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
         const s = seconds % 60;
@@ -127,33 +161,13 @@ export const columns: ColumnDef<Workout>[] = [
     accessorKey: "partnerBrand",
     header: "Partner Brand",
     cell: ({ row }) => (
-      <div className="text-sm italic text-muted-foreground">
+      <div className="text-sm italic text-muted-foreground font-medium">
         {row.original.partnerBrand || "Independent"}
       </div>
     ),
   },
   {
     id: "actions",
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="size-8">
-            <IconDotsVertical size={16} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem onClick={() => console.log("Stats", row.original.id)}>
-            Statistics
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="text-red-600 focus:text-red-600 font-medium"
-            onClick={() => console.log("Delete", row.original.id)}
-          >
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    cell: ({ row }) => <ActionCell workout={row.original} />,
   },
 ];

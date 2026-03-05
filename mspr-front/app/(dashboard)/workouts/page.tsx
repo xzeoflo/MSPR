@@ -5,54 +5,56 @@ import { DataTable } from "@/components/data-table";
 import { Workout } from "@/types/workout";
 import { columns } from "@/components/workouts/workout-columns";
 import { getAuthToken } from "@/lib/auth";
-import { IconAlertCircle, IconLoader2 } from "@tabler/icons-react";
+import { IconAlertCircle, IconLoader2, IconPlus } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import { CreateWorkoutViewer } from "@/components/workouts/create-workout-viewer";
 
 export default function WorkoutsPage() {
   const [data, setData] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+
+  const fetchWorkouts = async () => {
+    const token = getAuthToken();
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:8080/api/workouts", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const rawText = await response.text();
+
+      try {
+        const jsonData = JSON.parse(rawText);
+        setData(Array.isArray(jsonData) ? jsonData : []);
+        setError(null);
+      } catch (parseError) {
+        console.error("JSON Parse Error Details:", parseError);
+        console.error("Raw text received from server:", rawText);
+        throw new Error("Invalid JSON format. Check for circular references in Backend.");
+      }
+
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+      console.error("[Fetch Error]:", errorMessage);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
-
-    const getWorkouts = async () => {
-      const token = getAuthToken();
-      try {
-        setLoading(true);
-        const response = await fetch("http://localhost:8080/api/workouts", {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
-        }
-
-        const rawText = await response.text();
-
-        try {
-          const jsonData = JSON.parse(rawText);
-          setData(Array.isArray(jsonData) ? jsonData : []);
-          setError(null);
-        } catch (parseError) {
-          console.error("JSON Parse Error Details:", parseError);
-          console.error("Raw text received from server:", rawText);
-          throw new Error("Invalid JSON format. Check for circular references in Backend.");
-        }
-
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
-        console.error("[Fetch Error]:", errorMessage);
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getWorkouts();
+    fetchWorkouts();
   }, []);
 
   if (!mounted) return null;
@@ -89,16 +91,33 @@ export default function WorkoutsPage() {
         </div>
       ) : (
         !error && (
-          <DataTable<Workout>
-            data={data}
-            columns={columns}
-            filterColumn="difficulty"
-            filters={[
-              { label: "Beginner", value: "beginner" },
-              { label: "Intermediate", value: "intermediate" },
-              { label: "Advanced", value: "advanced" },
-            ]}
-          />
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <Button
+                variant="default"
+                size="sm"
+                className="h-8"
+                onClick={() => setCreateOpen(true)}
+              >
+                <IconPlus /> Create Workout
+              </Button>
+              <CreateWorkoutViewer
+                open={createOpen}
+                setOpen={setCreateOpen}
+                onWorkoutCreated={fetchWorkouts}
+              />
+            </div>
+            <DataTable<Workout>
+              data={data}
+              columns={columns}
+              filterColumn="difficulty"
+              filters={[
+                { label: "Beginner", value: "beginner" },
+                { label: "Intermediate", value: "intermediate" },
+                { label: "Advanced", value: "advanced" },
+              ]}
+            />
+          </>
         )
       )}
     </div>

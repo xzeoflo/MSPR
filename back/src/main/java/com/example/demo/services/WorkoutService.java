@@ -49,8 +49,9 @@ public class WorkoutService {
     }
 
     public Workout createWorkout(Workout workout, String requestingUserPartnerBrand) {
-        workout.setPartnerBrand(requestingUserPartnerBrand);
-
+        if (requestingUserPartnerBrand != null && !requestingUserPartnerBrand.isEmpty()) {
+            workout.setPartnerBrand(requestingUserPartnerBrand);
+        }
         if (workout.getExercises() != null && !workout.getExercises().isEmpty()) {
             String expectedType = workout.getWorkoutType().name();
 

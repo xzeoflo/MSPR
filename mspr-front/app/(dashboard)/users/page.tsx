@@ -5,56 +5,58 @@ import { DataTable } from "@/components/data-table";
 import { User } from "@/types/user";
 import { getAuthToken } from "@/lib/auth";
 import { columns } from "@/components/users/user-columns";
-import { IconAlertCircle, IconLoader2 } from "@tabler/icons-react";
+import { IconAlertCircle, IconLoader2, IconPlus } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import { CreateUserViewer } from "@/components/users/create-user-viewer";
 
 export default function UsersPage() {
   const [data, setData] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+
+  const fetchUsers = async () => {
+    const token = getAuthToken();
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:8080/api/users", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const rawText = await response.text();
+
+      try {
+        const jsonData = JSON.parse(rawText);
+        setData(Array.isArray(jsonData) ? jsonData : []);
+        setError(null);
+      } catch (parseErr: unknown) {
+        console.error("JSON Parse Error Details:", parseErr);
+        console.error("Raw text received:", rawText);
+        throw new Error("Invalid JSON format. Check for circular references in Backend.");
+      }
+
+    } catch (err: unknown) {
+      let message = "An unknown error occurred";
+      if (err instanceof Error) message = err.message;
+
+      console.error("[Fetch Error]:", message);
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
-
-    const getUsers = async () => {
-      const token = getAuthToken();
-      try {
-        setLoading(true);
-        const response = await fetch("http://localhost:8080/api/users", {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
-        }
-
-        const rawText = await response.text();
-
-        try {
-          const jsonData = JSON.parse(rawText);
-          setData(Array.isArray(jsonData) ? jsonData : []);
-          setError(null);
-        } catch (parseErr: unknown) {
-          console.error("JSON Parse Error Details:", parseErr);
-          console.error("Raw text received:", rawText);
-          throw new Error("Invalid JSON format. Check for circular references in Backend.");
-        }
-
-      } catch (err: unknown) {
-        let message = "An unknown error occurred";
-        if (err instanceof Error) message = err.message;
-
-        console.error("[Fetch Error]:", message);
-        setError(message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getUsers();
+    fetchUsers();
   }, []);
 
   if (!mounted) return null;
@@ -92,16 +94,33 @@ export default function UsersPage() {
         </div>
       ) : (
         !error && (
-          <DataTable<User>
-            data={data}
-            columns={columns}
-            filterColumn="role"
-            filters={[
-              { label: "Admins", value: "admin" },
-              { label: "Coaches", value: "coach" },
-              { label: "Clients", value: "client" }
-            ]}
-          />
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <Button
+                variant="default"
+                size="sm"
+                className="h-8"
+                onClick={() => setCreateOpen(true)}
+              >
+                <IconPlus /> Create User
+              </Button>
+              <CreateUserViewer
+                open={createOpen}
+                setOpen={setCreateOpen}
+                onUserCreated={fetchUsers}
+              />
+            </div>
+            <DataTable<User>
+              data={data}
+              columns={columns}
+              filterColumn="role"
+              filters={[
+                { label: "Admins", value: "admin" },
+                { label: "Coaches", value: "coach" },
+                { label: "Clients", value: "client" }
+              ]}
+            />
+          </>
         )
       )}
     </div>
