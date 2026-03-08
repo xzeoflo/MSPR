@@ -1,3 +1,5 @@
+"use client";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
@@ -63,6 +65,13 @@ const ActionCell = ({ user }: { user: User }) => {
 
 export const columns: ColumnDef<User>[] = [
   {
+    id: "_blank",
+    header: "",
+    cell: () => <div className="w-2" />,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "firstname",
     header: "User",
     cell: ({ row }) => <UserCellViewer item={row.original} />,
@@ -106,7 +115,11 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "subscriptionTier",
     header: "Subscription",
-    cell: ({ row }) => <Badge variant="outline">{row.original.subscriptionTier || "FREE"}</Badge>,
+    cell: ({ row }) => (
+      <Badge variant="outline" className="text-[10px] font-bold">
+        {row.original.subscriptionTier || "FREE"}
+      </Badge>
+    ),
   },
   {
     id: "actions",

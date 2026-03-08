@@ -5,7 +5,6 @@ import { Exercise } from "@/types/exercise";
 import { Button } from "@/components/ui/button";
 import {
   IconDotsVertical,
-  IconBarbell,
   IconClock,
   IconFlame,
   IconLoader2
@@ -24,7 +23,6 @@ const ActionCell = ({ exercise, onRefresh }: { exercise: Exercise; onRefresh: ()
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-
     setIsDeleting(true);
     const token = getAuthToken();
 
@@ -85,18 +83,28 @@ const getIntensityColor = (level: string) => {
 
 export const getColumns = (fetchExercises: () => void): ColumnDef<Exercise>[] => [
   {
+    id: "_blank",
+    header: "",
+    cell: () => <div className="w-2" />, // Espace vide pour le style
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "name",
     header: "Exercise",
     cell: ({ row }) => (
-      <div className="flex flex-col">
-        <span className="font-bold text-sm flex items-center gap-2">
-          <IconBarbell size={14} className="text-primary" />
-          {row.getValue("name")}
-        </span>
-        <span className="text-[11px] text-muted-foreground line-clamp-1 italic text-xs">
-          {row.original.exerciseType}
-        </span>
-      </div>
+      <span className="font-bold text-sm tracking-tight text-foreground/90">
+        {row.getValue("name")}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "exerciseType",
+    header: "Type",
+    cell: ({ row }) => (
+      <span className="text-sm font-bold tracking-tight">
+        {row.original.exerciseType}
+      </span>
     ),
   },
   {
@@ -105,7 +113,7 @@ export const getColumns = (fetchExercises: () => void): ColumnDef<Exercise>[] =>
     cell: ({ row }) => {
       const level = (row.getValue("intensityLevel") as string) || "UNKNOWN";
       return (
-        <div className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase border text-white ${getIntensityColor(level)}`}>
+        <div className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase border text-white shadow-sm ${getIntensityColor(level)}`}>
           <IconFlame size={10} />
           {level}
         </div>
@@ -132,8 +140,8 @@ export const getColumns = (fetchExercises: () => void): ColumnDef<Exercise>[] =>
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;
       return (
-        <div className="flex items-center gap-1.5 text-sm font-medium font-mono">
-          <IconClock size={14} className="text-muted-foreground" />
+        <div className="flex items-center gap-1.5 text-sm font-medium font-mono text-muted-foreground">
+          <IconClock size={14} />
           {mins > 0 ? `${mins}m ${secs}s` : `${secs}s`}
         </div>
       );

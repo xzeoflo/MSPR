@@ -129,7 +129,7 @@ export default function ExercisesPage() {
             <DataTable<Exercise>
               data={data}
               columns={getColumns(fetchExercises)}
-              filterColumn="name"
+              filterColumn="intensityLevel"
               filters={[
                 { label: "Beginner", value: "BEGINNER" },
                 { label: "Intermediate", value: "INTERMEDIATE" },

@@ -72,6 +72,13 @@ const ActionCell = ({ workout, onRefresh }: { workout: Workout; onRefresh: () =>
 
 export const getColumns = (fetchWorkouts: () => void): ColumnDef<Workout>[] => [
   {
+    id: "_blank",
+    header: "",
+    cell: () => <div className="w-2" />,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "title",
     header: "Workout",
     cell: ({ row }) => (
@@ -98,7 +105,7 @@ export const getColumns = (fetchWorkouts: () => void): ColumnDef<Workout>[] => [
       }
 
       return (
-        <div className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase border text-white ${variantClasses}`}>
+        <div className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase border text-white shadow-sm ${variantClasses}`}>
           <IconFlame size={10} />
           {difficultyValue}
         </div>
@@ -121,8 +128,8 @@ export const getColumns = (fetchWorkouts: () => void): ColumnDef<Workout>[] => [
       };
 
       return (
-        <div className="flex items-center gap-1.5 text-sm font-medium font-mono">
-          <IconClock size={14} className="text-muted-foreground" />
+        <div className="flex items-center gap-1.5 text-sm font-medium font-mono text-muted-foreground">
+          <IconClock size={14} />
           {formatDuration(totalSeconds)}
         </div>
       );
@@ -133,7 +140,7 @@ export const getColumns = (fetchWorkouts: () => void): ColumnDef<Workout>[] => [
     header: "Category",
     cell: ({ row }) => (
       <div className="flex flex-col gap-0">
-        <span className="text-sm font-medium leading-tight">{row.original.workoutType}</span>
+        <span className="text-sm font-bold tracking-tight">{row.original.workoutType}</span>
         <span className="text-[10px] text-muted-foreground italic leading-tight">
           {row.original.exerciseType}
         </span>
@@ -144,7 +151,7 @@ export const getColumns = (fetchWorkouts: () => void): ColumnDef<Workout>[] => [
     accessorKey: "partnerBrand",
     header: "Partner Brand",
     cell: ({ row }) => (
-      <div className="text-sm italic text-muted-foreground font-medium">
+      <div className="text-sm italic text-muted-foreground">
         {row.original.partnerBrand || "Independent"}
       </div>
     ),
