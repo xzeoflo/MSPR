@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { IconDotsVertical, IconLoader2 } from "@tabler/icons-react";
 import {
