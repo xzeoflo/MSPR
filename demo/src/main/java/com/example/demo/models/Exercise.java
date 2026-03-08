@@ -1,5 +1,6 @@
 package com.example.demo.models;
 
+import com.example.demo.models.enums.Intensity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,7 +22,11 @@ public class Exercise {
     private Integer repetitions;
     private Integer sets;
     private Integer caloriesBurned;
-    private String intensityLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Intensity intensityLevel;
+
     private String exerciseType;
 
     private Integer sequenceOrder;

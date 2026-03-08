@@ -24,7 +24,8 @@ public class WorkoutService {
     private final UserRepository userRepository;
     private final WorkoutMapper workoutMapper;
 
-    public WorkoutService(WorkoutRepository workoutRepository, UserRepository userRepository, WorkoutMapper workoutMapper) {
+    public WorkoutService(WorkoutRepository workoutRepository, UserRepository userRepository,
+            WorkoutMapper workoutMapper) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
         this.workoutMapper = workoutMapper;
@@ -51,19 +52,47 @@ public class WorkoutService {
         workout.setPartnerBrand(requestingUserPartnerBrand);
 
         if (workout.getExercises() != null && !workout.getExercises().isEmpty()) {
-            String expectedType = workout.getWorkoutType();
+            String expectedType = workout.getWorkoutType().name();
 
             for (Exercise exercise : workout.getExercises()) {
                 if (expectedType != null && !expectedType.equalsIgnoreCase(exercise.getExerciseType())) {
                     throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST,
-                            "Incohérence de type : L'exercice '" + exercise.getName() + "' est de type [" + exercise.getExerciseType() + "] mais le workout est de type [" + expectedType + "]."
-                    );
+                            "Incohérence de type : L'exercice '" + exercise.getName() + "' est de type ["
+                                    + exercise.getExerciseType() + "] mais le workout est de type [" + expectedType
+                                    + "].");
                 }
                 exercise.setWorkout(workout);
             }
         }
         return workoutRepository.save(workout);
+    }
+
+    @Transactional
+    public Workout updateWorkout(Integer id, Workout details, String userBrand, String role) {
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Workout not found"));
+
+        if (!role.equals("ADMIN") && !workout.getPartnerBrand().equals(userBrand)) {
+            throw new RuntimeException("Access Denied: Brand mismatch");
+        }
+
+        workout.setTitle(details.getTitle());
+        workout.setDescription(details.getDescription());
+        workout.setDifficulty(details.getDifficulty());
+        workout.setWorkoutType(details.getWorkoutType());
+        return workoutRepository.save(workout);
+    }
+
+    @Transactional
+    public void deleteWorkout(Integer id, String userBrand, String role) {
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Workout not found"));
+
+        if (!role.equals("ADMIN") && !workout.getPartnerBrand().equals(userBrand)) {
+            throw new RuntimeException("Access Denied: Brand mismatch");
+        }
+        workoutRepository.delete(workout);
     }
 
     public List<Workout> getWorkoutsByAgeRange(int minAge, int maxAge, String requestingUserPartnerBrand) {
@@ -87,7 +116,8 @@ public class WorkoutService {
     }
 
     private int calculateAge(LocalDate birthDate) {
-        if (birthDate == null) return 0;
+        if (birthDate == null)
+            return 0;
         return Period.between(birthDate, LocalDate.now()).getYears();
     }
 
@@ -107,22 +137,24 @@ public class WorkoutService {
 
     public List<Workout> getWorkoutsByType(String type, String requestingUserPartnerBrand) {
         return getAllWorkouts(requestingUserPartnerBrand).stream()
-                .filter(w -> w.getWorkoutType() != null && w.getWorkoutType().equalsIgnoreCase(type))
+                .filter(w -> w.getWorkoutType() != null && w.getWorkoutType().name().equalsIgnoreCase(type))
                 .collect(Collectors.toList());
     }
 
     public List<Workout> getWorkoutsByExerciseType(String exerciseType, String requestingUserPartnerBrand) {
         return getAllWorkouts(requestingUserPartnerBrand).stream()
                 .filter(w -> w.getExercises().stream()
-                        .anyMatch(e -> e.getExerciseType() != null && e.getExerciseType().equalsIgnoreCase(exerciseType)))
+                        .anyMatch(
+                                e -> e.getExerciseType() != null && e.getExerciseType().equalsIgnoreCase(exerciseType)))
                 .collect(Collectors.toList());
     }
 
     public List<Workout> getPureWorkouts(String workoutType, String exerciseType, String requestingUserPartnerBrand) {
         return getAllWorkouts(requestingUserPartnerBrand).stream()
-                .filter(w -> w.getWorkoutType() != null && w.getWorkoutType().equalsIgnoreCase(workoutType))
+                .filter(w -> w.getWorkoutType() != null && w.getWorkoutType().name().equalsIgnoreCase(workoutType))
                 .filter(w -> w.getExercises().stream()
-                        .allMatch(e -> e.getExerciseType() != null && e.getExerciseType().equalsIgnoreCase(exerciseType)))
+                        .allMatch(
+                                e -> e.getExerciseType() != null && e.getExerciseType().equalsIgnoreCase(exerciseType)))
                 .collect(Collectors.toList());
     }
 
@@ -150,7 +182,7 @@ public class WorkoutService {
 
     private void validateWorkoutCoherence(Workout workout) {
         if (workout.getExercises() != null) {
-            String expectedType = workout.getWorkoutType();
+            String expectedType = workout.getWorkoutType() != null ? workout.getWorkoutType().name() : null;
             workout.getExercises().forEach(ex -> {
                 if (expectedType != null && !expectedType.equalsIgnoreCase(ex.getExerciseType())) {
                     throw new IllegalArgumentException("Type mismatch for exercise: " + ex.getName());

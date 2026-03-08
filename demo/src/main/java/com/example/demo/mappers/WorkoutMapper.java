@@ -16,7 +16,8 @@ public class WorkoutMapper {
     }
 
     public WorkoutDTO toDTO(Workout entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
         WorkoutDTO dto = new WorkoutDTO();
         dto.setTitle(entity.getTitle());
         dto.setDescription(entity.getDescription());
@@ -36,14 +37,14 @@ public class WorkoutMapper {
     }
 
     public Workout toEntity(WorkoutDTO dto) {
-        if (dto == null) return null;
+        if (dto == null)
+            return null;
         Workout workout = new Workout();
         workout.setTitle(dto.getTitle() != null ? dto.getTitle() : "Nouveau Workout");
         workout.setDescription(dto.getDescription());
         workout.setDifficulty(dto.getDifficulty() != null ? dto.getDifficulty() : "Intermediate");
         workout.setWorkoutType(dto.getWorkoutType());
         workout.setPartnerBrand(dto.getPartnerBrand());
-
         if (dto.getExercises() != null && !dto.getExercises().isEmpty()) {
             workout.setExercises(dto.getExercises().stream()
                     .map(exDto -> {

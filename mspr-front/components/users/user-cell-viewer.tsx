@@ -156,7 +156,6 @@ export function UserCellViewer({ item }: UserCellViewerProps) {
           </div>
 
           <DrawerFooter className="pt-4 border-t">
-            {/* type="submit" linked to the form above */}
             <Button type="submit" form="edit-user-form">Save Changes</Button>
             <DrawerClose asChild>
               <Button variant="outline">Cancel</Button>

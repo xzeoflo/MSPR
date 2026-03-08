@@ -32,7 +32,7 @@ const menuData = {
     { title: "Dashboard", url: "/", icon: IconLayoutDashboard },
     { title: "Users", url: "/users", icon: IconUsers },
     { title: "Workouts", url: "/workouts", icon: IconBarbell },
-    { title: "Exercices", url: "/exercices", icon: IconStretching },
+    { title: "Exercises", url: "/exercises", icon: IconStretching },
   ],
   navSecondary: [
     { title: "Settings", url: "#", icon: IconSettings },
@@ -54,15 +54,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     async function fetchConnectedUser() {
       const token = getAuthToken();
+
       if (!token) return;
 
       try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const payload = JSON.parse(window.atob(base64));
-        const userEmail = payload.sub;
-
-        const response = await fetch(`http://localhost:8080/api/users/email/${userEmail}`, {
+        const response = await fetch(`http://localhost:8080/api/users/me`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
@@ -71,9 +67,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         if (response.ok) {
           const user = await response.json();
-          const fullName = (user.firstname && user.lastname)
-            ? `${user.firstname} ${user.lastname}`
-            : userEmail.split('@')[0];
+          console.log("User data from /me:", user);
+
+          const fname = user.firstname;
+          const lname = user.lastname;
+
+          const fullName = (fname || lname)
+            ? `${fname} ${lname}`.trim()
+            : user.email.split('@')[0];
 
           setUserData({
             name: fullName,
@@ -81,10 +82,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`,
           });
         } else {
-          setUserData(prev => ({ ...prev, name: userEmail.split('@')[0], email: userEmail }));
+          console.error("Erreur profil (Status):", response.status);
         }
       } catch (error) {
-        console.error("Erreur Sidebar:", error);
+        console.error("Erreur API Sidebar:", error);
       }
     }
 
@@ -98,7 +99,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton asChild className="p-1.5">
               <Link href="/">
                 <Rat className="text-primary" />
-                <span className="text-base font-semibold">HealthAi</span>
+                <span className="text-base font-semibold">HealthAI</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

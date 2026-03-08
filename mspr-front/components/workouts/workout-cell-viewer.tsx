@@ -42,16 +42,9 @@ export function WorkoutCellViewer({ item }: WorkoutCellViewerProps) {
         <Button
           variant="link"
           type="button"
-          className="text-foreground h-auto w-fit px-0 text-left font-medium hover:no-underline"
+          className="text-foreground w-fit px-0 text-left font-medium"
         >
-          <div className="flex flex-col items-start">
-            <span className="font-bold text-sm leading-none mb-1">
-              {item.title}
-            </span>
-            <span className="text-[11px] text-muted-foreground line-clamp-1 italic font-normal">
-              {item.description}
-            </span>
-          </div>
+          {item.title}
         </Button>
       </DrawerTrigger>
       <DrawerPortal>

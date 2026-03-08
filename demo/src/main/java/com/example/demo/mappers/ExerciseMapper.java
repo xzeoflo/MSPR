@@ -1,5 +1,6 @@
 package com.example.demo.mappers;
 
+import com.example.demo.models.enums.Intensity;
 import com.example.demo.dto.ExerciseDTO;
 import com.example.demo.models.Exercise;
 import org.springframework.stereotype.Component;
@@ -8,7 +9,8 @@ import org.springframework.stereotype.Component;
 public class ExerciseMapper {
 
     public ExerciseDTO toDTO(Exercise entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
         ExerciseDTO dto = new ExerciseDTO();
         dto.setName(entity.getName());
         dto.setDescription(entity.getDescription());
@@ -23,7 +25,8 @@ public class ExerciseMapper {
     }
 
     public Exercise toEntity(ExerciseDTO dto) {
-        if (dto == null) return null;
+        if (dto == null)
+            return null;
         Exercise exercise = new Exercise();
 
         exercise.setName(dto.getName() != null ? dto.getName() : "Sans nom");
@@ -32,7 +35,7 @@ public class ExerciseMapper {
         exercise.setRepetitions(dto.getRepetitions() != null ? dto.getRepetitions() : 0);
         exercise.setSets(dto.getSets() != null ? dto.getSets() : 0);
         exercise.setCaloriesBurned(dto.getCaloriesBurned() != null ? dto.getCaloriesBurned() : 0);
-        exercise.setIntensityLevel(dto.getIntensityLevel() != null ? dto.getIntensityLevel() : "Medium");
+        exercise.setIntensityLevel(dto.getIntensityLevel() != null ? dto.getIntensityLevel() : Intensity.INTERMEDIATE);
         exercise.setExerciseType(dto.getExerciseType());
         exercise.setSequenceOrder(dto.getSequenceOrder() != null ? dto.getSequenceOrder() : 1);
 

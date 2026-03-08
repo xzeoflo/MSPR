@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.util.List;
 
+import com.example.demo.models.enums.WorkoutType;
+
 @Data
 public class WorkoutDTO {
     @NotBlank(message = "title is required")
@@ -15,7 +17,7 @@ public class WorkoutDTO {
     private String difficulty;
 
     @NotBlank(message = "workoutType is required")
-    private String workoutType;
+    private WorkoutType workoutType;
 
     private String partnerBrand;
 
