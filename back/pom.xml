@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>back</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>MSPR</name>
     <description>Backend HealthAI Coach - Java 21</description>
