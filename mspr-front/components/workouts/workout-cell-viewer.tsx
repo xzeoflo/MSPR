@@ -154,7 +154,6 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
           </DrawerHeader>
 
           <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm flex-1">
-            {/* L'id du form doit correspondre au form="id" du bouton submit */}
             <form id="edit-workout-form" onSubmit={handleUpdate} noValidate className="flex flex-col gap-6 py-4">
 
               <div className="space-y-4">
@@ -184,6 +183,7 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
                       <SelectItem value="BEGINNER">Beginner</SelectItem>
                       <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                       <SelectItem value="ADVANCED">Advanced</SelectItem>
+                      <SelectItem value="NIGHTMARE">Nightmare</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -195,6 +195,8 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
                       <SelectItem value="STRENGTH">Strength</SelectItem>
                       <SelectItem value="CARDIO">Cardio</SelectItem>
                       <SelectItem value="HIIT">HIIT</SelectItem>
+                      <SelectItem value="CORE">Core</SelectItem>
+                      <SelectItem value="FLEXIBILITY">Flexibility</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

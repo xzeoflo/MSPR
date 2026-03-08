@@ -17,12 +17,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { WorkoutCellViewer } from "./workout-cell-viewer";
-import { DragHandle } from "../drag-handle";
 import { useState } from "react";
 import { getAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
 
-// On passe fetchWorkouts à l'ActionCell pour éviter le reload()
 const ActionCell = ({ workout, onRefresh }: { workout: Workout; onRefresh: () => void }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -42,7 +40,7 @@ const ActionCell = ({ workout, onRefresh }: { workout: Workout; onRefresh: () =>
 
       if (response.ok) {
         toast.success(`Workout "${workout.title}" deleted`);
-        onRefresh(); // Refresh fluide de la DataTable
+        onRefresh();
       } else {
         toast.error("Failed to delete workout");
       }
@@ -72,24 +70,14 @@ const ActionCell = ({ workout, onRefresh }: { workout: Workout; onRefresh: () =>
   );
 };
 
-// Exportation sous forme de fonction pour injecter le rafraîchissement
 export const getColumns = (fetchWorkouts: () => void): ColumnDef<Workout>[] => [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => {
-      const id = row.original.id;
-      if (id === undefined) return null;
-      return <DragHandle id={id} />;
-    },
-  },
   {
     accessorKey: "title",
     header: "Workout",
     cell: ({ row }) => (
       <WorkoutCellViewer
         item={row.original}
-        onWorkoutUpdated={fetchWorkouts} // L'update refresh maintenant la table
+        onWorkoutUpdated={fetchWorkouts}
       />
     ),
   },

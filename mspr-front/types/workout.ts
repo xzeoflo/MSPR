@@ -6,10 +6,10 @@ export const workoutSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   description: z.string().min(1, "La description est requise"),
   totalDurationInSeconds: z.number().optional(),
-  difficulty: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]),
-  workoutType: z.string().min(1, "Le type de workout est requis"), // Java: workoutType
+  difficulty: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED", "NIGHTMARE"]),
+  workoutType: z.string().min(1, "Le type de workout est requis"),
   exercises: z.array(exerciseSchema).default([]),
-  exerciseType: z.string().optional(), // Peut être null selon ton entité
+  exerciseType: z.string().optional(),
   partnerBrand: z.string().optional().nullable(),
   createdAt: z.string().optional(),
 });

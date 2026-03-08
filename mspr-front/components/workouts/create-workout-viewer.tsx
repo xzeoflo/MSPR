@@ -167,7 +167,8 @@ export function CreateWorkoutViewer({ open, setOpen, onWorkoutCreated }: { open:
                       <SelectItem value="STRENGTH">Strength</SelectItem>
                       <SelectItem value="CARDIO">Cardio</SelectItem>
                       <SelectItem value="HIIT">HIIT</SelectItem>
-                      <SelectItem value="YOGA">Yoga</SelectItem>
+                      <SelectItem value="CORE">Core</SelectItem>
+                      <SelectItem value="FLEXIBILITY">Flexibility</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -179,6 +180,7 @@ export function CreateWorkoutViewer({ open, setOpen, onWorkoutCreated }: { open:
                       <SelectItem value="BEGINNER">Beginner</SelectItem>
                       <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                       <SelectItem value="ADVANCED">Advanced</SelectItem>
+                      <SelectItem value="NIGHTMARE">Nightmare</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

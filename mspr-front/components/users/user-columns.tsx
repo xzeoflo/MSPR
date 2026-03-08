@@ -9,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { DragHandle } from "../drag-handle";
 import { UserCellViewer } from "./user-cell-viewer";
 import { useState } from "react";
 import { getAuthToken } from "@/lib/auth";
@@ -63,11 +62,6 @@ const ActionCell = ({ user }: { user: User }) => {
 };
 
 export const columns: ColumnDef<User>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
   {
     accessorKey: "firstname",
     header: "User",

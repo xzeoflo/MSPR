@@ -2,12 +2,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { DataTable } from "@/components/data-table";
-import { columns } from "@/components/exercises/exercise-columns";
+import { getColumns } from "@/components/exercises/exercise-columns";
 import { getAuthToken } from "@/lib/auth";
 import { Exercise } from "@/types/exercise";
 import { IconAlertCircle, IconLoader2, IconRefresh, IconPlus } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { CreateExerciseViewer } from "@/components/exercises/create-exercises-viewer"
+import { CreateExerciseViewer } from "@/components/exercises/create-exercises-viewer";
+import { Separator } from "@/components/ui/separator";
 
 export default function ExercisesPage() {
   const [data, setData] = useState<Exercise[]>([]);
@@ -55,47 +56,49 @@ export default function ExercisesPage() {
 
   return (
     <div className="flex flex-1 flex-col p-4 md:p-6 lg:p-8 space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header avec Actions harmonisées */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Exercises
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-sm font-medium">
             {loading
-              ? "Loading exercises..."
+              ? "Syncing with database..."
               : error
-                ? "Error loading data"
-                : `Catalogue of ${data.length} movement patterns.`}
+                ? "Connection failed"
+                : `Managing ${data.length} movement patterns.`}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Bouton Refresh */}
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="sm"
+            size="icon"
             onClick={fetchExercises}
             disabled={loading}
-            className="gap-2 h-9"
+            className="h-9 w-9"
           >
-            <IconRefresh size={16} className={loading ? "animate-spin" : ""} />
-            <span className="hidden sm:inline">Refresh</span>
+            <IconRefresh
+              size={18}
+              className={`${loading ? "animate-spin" : ""} text-muted-foreground`}
+            />
           </Button>
 
-          {/* Bouton de création */}
+          <Separator orientation="vertical" className="h-6 mx-1 hidden sm:block" />
+
           <Button
             variant="default"
             size="sm"
             onClick={() => setCreateOpen(true)}
-            className="gap-2 h-9"
+            className="h-9 gap-2 px-4 shadow-sm"
           >
-            <IconPlus size={16} />
-            Create Exercise
+            <IconPlus size={18} />
+            <span className="font-semibold">Create Exercise</span>
           </Button>
         </div>
       </div>
 
-      {/* Le Drawer de création */}
       <CreateExerciseViewer
         open={createOpen}
         setOpen={setCreateOpen}
@@ -103,35 +106,38 @@ export default function ExercisesPage() {
       />
 
       {error && (
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive flex items-start gap-3">
+        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-destructive flex items-start gap-3 shadow-sm">
           <IconAlertCircle className="h-5 w-5 mt-0.5" />
           <div className="flex-1">
-            <h3 className="font-bold leading-none mb-1">API Error</h3>
-            <p className="text-sm opacity-90">{error}</p>
-            <p className="text-xs mt-2 italic text-destructive/80">
-              Check if the backend is running at :8080 and /api/v1/exercises is correct.
-            </p>
+            <h3 className="font-bold text-sm leading-none mb-1">API Connection Error</h3>
+            <p className="text-xs opacity-90">{error}</p>
           </div>
+          <Button size="sm" variant="ghost" onClick={fetchExercises} className="h-7 text-xs hover:bg-destructive/10">
+            Retry
+          </Button>
         </div>
       )}
 
-      {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      {loading && data.length === 0 ? (
+        <div className="flex h-[400px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed bg-muted/30">
+          <IconLoader2 className="h-10 w-10 animate-spin text-primary/40" />
+          <p className="text-sm font-medium text-muted-foreground">Fetching catalog...</p>
         </div>
       ) : (
         !error && (
-          <DataTable<Exercise>
-            data={data}
-            columns={columns}
-            filterColumn="name"
-            filters={[
-              { label: "Beginner", value: "BEGINNER" },
-              { label: "Intermediate", value: "INTERMEDIATE" },
-              { label: "Advanced", value: "ADVANCED" },
-              { label: "Nightmare", value: "NIGHTMARE" },
-            ]}
-          />
+          <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+            <DataTable<Exercise>
+              data={data}
+              columns={getColumns(fetchExercises)}
+              filterColumn="name"
+              filters={[
+                { label: "Beginner", value: "BEGINNER" },
+                { label: "Intermediate", value: "INTERMEDIATE" },
+                { label: "Advanced", value: "ADVANCED" },
+                { label: "Nightmare", value: "NIGHTMARE" },
+              ]}
+            />
+          </div>
         )
       )}
     </div>

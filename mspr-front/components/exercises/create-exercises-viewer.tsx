@@ -26,6 +26,20 @@ import {
   DrawerPortal
 } from "@/components/ui/drawer";
 
+const EXERCISE_TYPES = [
+  { label: "Cardio", value: "CARDIO" },
+  { label: "Strength", value: "STRENGTH" },
+  { label: "Flexibility", value: "FLEXIBILITY" },
+  { label: "Hiit", value: "HIIT" },
+  { label: "Core", value: "CORE" },
+];
+const INTENSITY_LEVELS = [
+  { label: "Beginner", value: "BEGINNER" },
+  { label: "Intermediate", value: "INTERMEDIATE" },
+  { label: "Advanced", value: "ADVANCED" },
+  { label: "Nightmare", value: "NIGHTMARE" },
+];
+
 interface CreateExerciseViewerProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -40,14 +54,14 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
     const formData = new FormData(event.currentTarget);
     const rawData = Object.fromEntries(formData.entries());
 
-    // Conversion des types pour correspondre au backend (Strings -> Integers)
     const payload = {
       ...rawData,
-      durationInSeconds: parseInt(rawData.durationInSeconds as string),
-      repetitions: parseInt(rawData.repetitions as string),
-      sets: parseInt(rawData.sets as string),
-      caloriesBurned: parseInt(rawData.caloriesBurned as string),
-      sequenceOrder: 0, // Par défaut
+      durationInSeconds: parseInt(rawData.durationInSeconds as string) || 0,
+      repetitions: parseInt(rawData.repetitions as string) || 0,
+      sets: parseInt(rawData.sets as string) || 0,
+      caloriesBurned: parseInt(rawData.caloriesBurned as string) || 0,
+      sequenceOrder: 0,
+      workout: null, // Pour éviter le NullPointerException que tu avais
     };
 
     const token = getAuthToken();
@@ -99,10 +113,24 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
                   <Label htmlFor="name" className="text-xs font-semibold uppercase text-muted-foreground">Exercise Name</Label>
                   <Input id="name" name="name" placeholder="e.g. Bench Press" required />
                 </div>
+
+                {/* REMPLACEMENT DE L'INPUT PAR UN SELECT POUR LE TYPE */}
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="exerciseType" className="text-xs font-semibold uppercase text-muted-foreground">Type</Label>
-                  <Input id="exerciseType" name="exerciseType" placeholder="e.g. Strength, Cardio" required />
+                  <Select name="exerciseType" defaultValue="STRENGTH" required>
+                    <SelectTrigger id="exerciseType">
+                      <SelectValue placeholder="Select exercise type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EXERCISE_TYPES.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="description" className="text-xs font-semibold uppercase text-muted-foreground">Description</Label>
                   <Textarea id="description" name="description" placeholder="Describe the movement..." className="min-h-[80px]" required />
@@ -111,6 +139,7 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
 
               <Separator />
 
+              {/* technical Section */}
               <div className="space-y-4">
                 <h4 className="text-sm font-bold text-primary italic">Technical Specs</h4>
                 <div className="grid grid-cols-2 gap-4">
@@ -119,10 +148,11 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
                     <Select name="intensityLevel" defaultValue="BEGINNER" required>
                       <SelectTrigger id="intensityLevel"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="BEGINNER">Beginner</SelectItem>
-                        <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
-                        <SelectItem value="ADVANCED">Advanced</SelectItem>
-                        <SelectItem value="NIGHTMARE">Nightmare</SelectItem>
+                        {INTENSITY_LEVELS.map((level) => (
+                          <SelectItem key={level.value} value={level.value}>
+                            {level.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
