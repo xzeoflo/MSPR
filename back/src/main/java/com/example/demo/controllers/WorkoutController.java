@@ -61,7 +61,8 @@ public class WorkoutController {
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<Workout> update(@PathVariable Integer id, @RequestBody Workout workout, Authentication auth) {
         User user = (User) auth.getPrincipal();
-        return ResponseEntity.ok(workoutService.updateWorkout(id, workout, user.getPartnerBrand(), user.getRole().name()));
+        return ResponseEntity
+                .ok(workoutService.updateWorkout(id, workout, user.getPartnerBrand(), user.getRole().name()));
     }
 
     @DeleteMapping("/{id}")
@@ -151,14 +152,17 @@ public class WorkoutController {
     @PostMapping("/import")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<String> importWorkouts(
-            @RequestBody @Valid List<WorkoutDTO> workoutDTOs,
-            Principal principal) {
+            @RequestBody List<WorkoutDTO> workoutDTOs,
+            Authentication auth) {
 
-        String brand = getRequestingUserPartner(principal);
+        User user = (User) auth.getPrincipal();
+        String brand = user.getPartnerBrand();
+
         try {
             workoutService.importWorkouts(workoutDTOs, brand);
             return ResponseEntity.ok("Importation réussie de " + workoutDTOs.size() + " workouts.");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Erreur lors de l'import : " + e.getMessage());
         }
     }
