@@ -29,8 +29,13 @@ import { getAuthToken } from "@/lib/auth";
 import { workoutSchema, type Workout } from "@/types/workout";
 import { type Exercise } from "@/types/exercise";
 
+type WorkoutDifficulty = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
+type WorkoutType = "STRENGTH" | "HIIT" | "CARDIO" | "CORE";
+
+type NumericExerciseFields = 'durationInSeconds' | 'repetitions' | 'sets' | 'caloriesBurned';
+
 type RawExercise = Partial<Exercise> & Record<string, unknown>;
-type RawWorkout = Partial<Workout> & {
+type RawWorkout = Partial<Omit<Workout, 'exercises'>> & {
   exercises?: RawExercise[];
 } & Record<string, unknown>;
 
@@ -58,16 +63,16 @@ export default function ImportWorkoutsPage() {
   const processSingleWorkout = useCallback((raw: RawWorkout, index: number): { workout?: Workout; error?: ValidationError } => {
     const preparedData = {
       ...raw,
-      description: raw.description || "Imported workout",
-      workoutType: raw.workoutType?.toUpperCase() || "STRENGTH",
-      difficulty: (raw.difficulty?.toUpperCase() as any) || "BEGINNER",
+      description: (raw.description as string) || "Imported workout",
+      workoutType: ((raw.workoutType as string)?.toUpperCase() as WorkoutType) || "STRENGTH",
+      difficulty: ((raw.difficulty as string)?.toUpperCase() as WorkoutDifficulty) || "BEGINNER",
       exercises: (raw.exercises || []).map((ex, exIdx) => ({
         ...ex,
-        description: ex.description || "Exercise description",
-        caloriesBurned: ex.caloriesBurned,
-        intensityLevel: ex.intensityLevel || raw.difficulty || "BEGINNER",
-        sequenceOrder: ex.sequenceOrder ?? exIdx,
-        exerciseType: ex.exerciseType?.toUpperCase() || raw.workoutType?.toUpperCase() || "STRENGTH",
+        description: (ex.description as string) || "Exercise description",
+        caloriesBurned: ex.caloriesBurned as number | undefined,
+        intensityLevel: (ex.intensityLevel as string) || (raw.difficulty as string) || "BEGINNER",
+        sequenceOrder: (ex.sequenceOrder as number) ?? exIdx,
+        exerciseType: (ex.exerciseType as string)?.toUpperCase() || (raw.workoutType as string)?.toUpperCase() || "STRENGTH",
       })),
     };
 
@@ -109,8 +114,8 @@ export default function ImportWorkoutsPage() {
     return { workout: result.data as Workout };
   }, []);
 
-  const handleUpdateField = (errorId: string, field: string, value: any) => {
-    let processedValue = value;
+  const handleUpdateField = (errorId: string, field: string, value: string) => {
+    let processedValue: string | number | undefined = value;
     if (['durationInSeconds', 'repetitions', 'sets', 'caloriesBurned'].some(key => field.includes(key))) {
       processedValue = value === "" ? undefined : parseInt(value, 10);
     }
@@ -121,12 +126,13 @@ export default function ImportWorkoutsPage() {
 
       const updatedErrors = [...currentErrors];
       const error = updatedErrors[errorIndex];
-      const updatedRaw = JSON.parse(JSON.stringify(error.workout));
+      const updatedRaw = JSON.parse(JSON.stringify(error.workout)) as RawWorkout;
 
       if (field.startsWith("exercises.")) {
         const parts = field.split(".");
         const idx = parseInt(parts[1]);
         const subField = parts[2];
+        if (!updatedRaw.exercises) updatedRaw.exercises = [];
         if (!updatedRaw.exercises[idx]) updatedRaw.exercises[idx] = {};
         updatedRaw.exercises[idx][subField] = processedValue;
       } else {
@@ -166,7 +172,7 @@ export default function ImportWorkoutsPage() {
         const newValid: Workout[] = [];
         const newErrors: ValidationError[] = [];
 
-        rawData.forEach((item, index) => {
+        rawData.forEach((item: unknown, index: number) => {
           const { workout, error } = processSingleWorkout(item as RawWorkout, index + 1);
           if (workout) newValid.push(workout);
           if (error) newErrors.push(error);
@@ -197,8 +203,9 @@ export default function ImportWorkoutsPage() {
       if (!res.ok) throw new Error("Import failed");
       toast.success(`${validWorkouts.length} workouts imported!`);
       setFile(null); setValidWorkouts([]); setErrors([]);
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An unknown error occurred";
+      toast.error(message);
     } finally {
       setIsImporting(false);
     }
@@ -266,16 +273,16 @@ export default function ImportWorkoutsPage() {
                       <div className="space-y-1.5">
                         <label className="text-[9px] font-bold text-zinc-500 uppercase">Title</label>
                         {err.errorPaths.includes('title') ? (
-                          <Input className="h-8 text-xs bg-zinc-900 border-destructive/50 text-zinc-100" value={err.workout.title ?? ""} onChange={(e) => handleUpdateField(err.id, 'title', e.target.value)} />
+                          <Input className="h-8 text-xs bg-zinc-900 border-destructive/50 text-zinc-100" value={(err.workout.title as string) ?? ""} onChange={(e) => handleUpdateField(err.id, 'title', e.target.value)} />
                         ) : (
-                          <div className="h-8 flex items-center text-xs text-zinc-300 px-1 font-medium italic">{err.workout.title || "Untitled"}</div>
+                          <div className="h-8 flex items-center text-xs text-zinc-300 px-1 font-medium italic">{(err.workout.title as string) || "Untitled"}</div>
                         )}
                       </div>
 
                       <div className="space-y-1.5">
                         <label className="text-[9px] font-bold text-zinc-500 uppercase">Type</label>
                         {err.errorPaths.includes('workoutType') ? (
-                          <Select onValueChange={(v) => handleUpdateField(err.id, 'workoutType', v)} value={err.workout.workoutType ?? ""}>
+                          <Select onValueChange={(v) => handleUpdateField(err.id, 'workoutType', v)} value={(err.workout.workoutType as string) ?? ""}>
                             <SelectTrigger className="h-8 text-xs bg-zinc-900 border-destructive/50 text-zinc-100"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="STRENGTH">STRENGTH</SelectItem>
@@ -285,19 +292,19 @@ export default function ImportWorkoutsPage() {
                             </SelectContent>
                           </Select>
                         ) : (
-                          <div className="h-8 flex items-center"><Badge variant="outline" className="text-[9px] border-zinc-800 text-zinc-400 uppercase">{err.workout.workoutType}</Badge></div>
+                          <div className="h-8 flex items-center"><Badge variant="outline" className="text-[9px] border-zinc-800 text-zinc-400 uppercase">{err.workout.workoutType as string}</Badge></div>
                         )}
                       </div>
 
                       <div className="space-y-1.5">
                         <label className="text-[9px] font-bold text-zinc-500 uppercase">Difficulty</label>
                         {err.errorPaths.includes('difficulty') ? (
-                          <Select onValueChange={(v) => handleUpdateField(err.id, 'difficulty', v)} value={err.workout.difficulty ?? ""}>
+                          <Select onValueChange={(v) => handleUpdateField(err.id, 'difficulty', v)} value={(err.workout.difficulty as string) ?? ""}>
                             <SelectTrigger className="h-8 text-xs bg-zinc-900 border-destructive/50 text-zinc-100"><SelectValue /></SelectTrigger>
                             <SelectContent><SelectItem value="BEGINNER">BEGINNER</SelectItem><SelectItem value="INTERMEDIATE">INTERMEDIATE</SelectItem><SelectItem value="ADVANCED">ADVANCED</SelectItem></SelectContent>
                           </Select>
                         ) : (
-                          <div className="h-8 flex items-center text-xs text-zinc-300 px-1 font-medium italic">{err.workout.difficulty}</div>
+                          <div className="h-8 flex items-center text-xs text-zinc-300 px-1 font-medium italic">{err.workout.difficulty as string}</div>
                         )}
                       </div>
                     </div>
@@ -310,10 +317,10 @@ export default function ImportWorkoutsPage() {
                         <div key={idx} className={`rounded-lg p-4 border transition-all ${hasExError ? 'bg-zinc-900/40 border-zinc-800' : 'bg-transparent border-zinc-900'}`}>
                           <div className="flex items-center gap-2 text-zinc-300 mb-4">
                             <IconBarbell size={14} className="text-zinc-500" />
-                            <span className="text-[9px] font-bold uppercase tracking-wider italic">Ex #{idx + 1}: {ex.name || 'Untitled'}</span>
+                            <span className="text-[9px] font-bold uppercase tracking-wider italic">Ex #{idx + 1}: {(ex.name as string) || 'Untitled'}</span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            {['caloriesBurned', 'durationInSeconds', 'repetitions', 'sets'].map((field) => {
+                            {(['caloriesBurned', 'durationInSeconds', 'repetitions', 'sets'] as NumericExerciseFields[]).map((field) => {
                               const path = `exercises.${idx}.${field}`;
                               const isError = err.errorPaths.includes(path);
                               return (
@@ -326,11 +333,11 @@ export default function ImportWorkoutsPage() {
                                       type="number"
                                       placeholder="Missing"
                                       className="h-8 text-xs bg-zinc-950 border-destructive/50 text-white placeholder:text-destructive/40"
-                                      value={(ex as any)[field] ?? ""}
+                                      value={(ex[field] as string | number) ?? ""}
                                       onChange={(e) => handleUpdateField(err.id, path, e.target.value)}
                                     />
                                   ) : (
-                                    <div className="h-8 flex items-center text-xs text-zinc-500 px-1">{(ex as any)[field] ?? 0}</div>
+                                    <div className="h-8 flex items-center text-xs text-zinc-500 px-1">{(ex[field] as number) ?? 0}</div>
                                   )}
                                 </div>
                               );
@@ -358,9 +365,9 @@ export default function ImportWorkoutsPage() {
                   <IconCheck size={16} />
                   <h3 className="text-[10px] font-bold uppercase tracking-[0.2em]">Ready for Import ({validWorkouts.length})</h3>
                 </div>
-                <Button variant="ghost" size="sm" className="text-[9px] h-6 uppercase font-bold text-zinc-500" onClick={() => setShowPreview(!showPreview)}>
+                <button className="text-[9px] h-6 uppercase font-bold text-zinc-500 hover:text-white transition-colors" onClick={() => setShowPreview(!showPreview)}>
                   {showPreview ? "Hide Preview" : "Show Preview"}
-                </Button>
+                </button>
               </div>
               {showPreview && (
                 <div className="rounded-xl border border-zinc-900 bg-zinc-950/50 divide-y divide-zinc-900">

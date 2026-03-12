@@ -15,11 +15,12 @@ export default function DashboardLayout({
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
+      className="h-screen overflow-hidden"
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        <div className="flex flex-1 flex-col p-6 space-y-6 overflow-y-auto">
+        <div className="flex flex-1 flex-col p-6 space-y-6 overflow-y-auto overflow-x-hidden">
           <div className="mx-auto w-full max-w-7xl">{children}</div>
         </div>
       </SidebarInset>
