@@ -4,6 +4,7 @@ import com.example.demo.models.User;
 import com.example.demo.models.Workout;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.validators.UserValidator;
+import com.example.demo.models.enums.SubscriptionTier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,29 @@ public class UserService {
         return user;
     }
 
+    public User createUser(User user, String requestingUserPartnerBrand) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+        }
+
+        userValidator.validateEmail(user.getEmail());
+        userValidator.validatePassword(user.getPassword());
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        if (requestingUserPartnerBrand != null) {
+            user.setPartnerBrand(requestingUserPartnerBrand);
+        }
+
+        if (user.getSubscriptionTier() == null) {
+            user.setSubscriptionTier(SubscriptionTier.REFERENCE);
+        }
+
+        userValidator.validatePartnerBrand(user);
+
+        return userRepository.save(user);
+    }
+
     public User updateUser(Integer id, User userDetails, String requestingUserPartnerBrand) {
         User user = getUserById(id, requestingUserPartnerBrand);
 
@@ -64,9 +88,12 @@ public class UserService {
             user.setEmail(userDetails.getEmail());
         }
 
-        if (userDetails.getFirstname() != null) user.setFirstname(userDetails.getFirstname());
-        if (userDetails.getLastname() != null) user.setLastname(userDetails.getLastname());
+        if (userDetails.getFirstName() != null) user.setFirstName(userDetails.getFirstName());
+        if (userDetails.getLastName() != null) user.setLastName(userDetails.getLastName());
         if (userDetails.getBirthday() != null) user.setBirthday(userDetails.getBirthday());
+        if (userDetails.getGender() != null) user.setGender(userDetails.getGender());
+        if (userDetails.getActivityLevel() != null) user.setActivityLevel(userDetails.getActivityLevel());
+        if (userDetails.getObjective() != null) user.setObjective(userDetails.getObjective());
         if (userDetails.getSubscriptionTier() != null) user.setSubscriptionTier(userDetails.getSubscriptionTier());
 
         if (userDetails.getPartnerBrand() != null || (userDetails.getRole() != null && user.getRole() != userDetails.getRole())) {

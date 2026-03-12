@@ -4,5 +4,6 @@ public enum SubscriptionTier {
     FREEMIUM,
     PREMIUM,
     PREMIUM_PLUS,
-    B2B
+    B2B,
+    REFERENCE
 }

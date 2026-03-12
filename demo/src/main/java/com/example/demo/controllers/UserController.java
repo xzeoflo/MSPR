@@ -31,6 +31,13 @@ public class UserController {
         return null;
     }
 
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> createUser(@RequestBody User user, Principal principal) {
+        String brand = getRequestingUserPartner(principal);
+        return ResponseEntity.status(201).body(userService.createUser(user, brand));
+    }
+
     @GetMapping("/me")
     public ResponseEntity<User> getMyProfile(Principal principal) {
         if (principal == null) {
@@ -64,7 +71,7 @@ public class UserController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
     public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User userDetails,
-            Principal principal) {
+                                           Principal principal) {
         String brand = getRequestingUserPartner(principal);
         return ResponseEntity.ok(userService.updateUser(id, userDetails, brand));
     }
