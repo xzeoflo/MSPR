@@ -14,7 +14,6 @@ import java.util.List;
 public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final WorkoutRepository workoutRepository;
-
     public Exercise create(Exercise exercise, String userBrand, String role) {
         if (exercise.getWorkout() != null && exercise.getWorkout().getId() != null) {
 

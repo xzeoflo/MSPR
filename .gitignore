@@ -40,13 +40,24 @@ demo/.idea/
 demo/target/
 *.class
 *.jar
-
+back/.idea/
+back/target/
+/back/target/      # Pour Maven (fichiers .class et packages)
+/back/build/       # Pour Gradle ou autres outils
+/back/*.jar
+/back/*.war
+/back/*.
 # Fichiers d'IDE (Exemples : IntelliJ, Eclipse, VS Code)
 /demo/.idea/
 /demo/*.iws
 /demo/*.iml
 /demo/.settings/
 /demo/.vscode/
+/back/.idea/
+/back/*.iws
+/back/*.iml
+/back/.settings/
+/back/.vscode/
 
 # 4. MISCELLANÉES & ENVRONNEMENT
 # --------------------------------------------------------------------
