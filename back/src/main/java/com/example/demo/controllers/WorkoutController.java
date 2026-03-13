@@ -5,7 +5,6 @@ import com.example.demo.models.Workout;
 import com.example.demo.models.User;
 import com.example.demo.services.WorkoutService;
 import com.example.demo.services.UserService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
