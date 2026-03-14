@@ -95,12 +95,12 @@ export function UserCellViewer({ item }: UserCellViewerProps) {
                 <h4 className="text-sm font-bold text-primary italic">Identity</h4>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="firstname" className="text-xs font-semibold uppercase text-muted-foreground">First Name</Label>
-                    <Input id="firstname" name="firstname" defaultValue={item.firstName} required />
+                    <Label htmlFor="firstName" className="text-xs font-semibold uppercase text-muted-foreground">First Name</Label>
+                    <Input id="firstName" name="firstName" defaultValue={item.firstName} required />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="lastname" className="text-xs font-semibold uppercase text-muted-foreground">Last Name</Label>
-                    <Input id="lastname" name="lastname" defaultValue={item.lastName || ""} />
+                    <Label htmlFor="lastName" className="text-xs font-semibold uppercase text-muted-foreground">Last Name</Label>
+                    <Input id="lastName" name="lastName" defaultValue={item.lastName || ""} />
                   </div>
                 </div>
 
