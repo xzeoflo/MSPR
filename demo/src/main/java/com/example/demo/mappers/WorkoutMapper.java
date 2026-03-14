@@ -16,7 +16,8 @@ public class WorkoutMapper {
     }
 
     public WorkoutDTO toDTO(Workout entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
         WorkoutDTO dto = new WorkoutDTO();
         dto.setTitle(entity.getTitle());
         dto.setDescription(entity.getDescription());
@@ -36,7 +37,8 @@ public class WorkoutMapper {
     }
 
     public Workout toEntity(WorkoutDTO dto) {
-        if (dto == null) return null;
+        if (dto == null)
+            return null;
         Workout workout = new Workout();
         workout.setTitle(dto.getTitle() != null ? dto.getTitle() : "Nouveau Workout");
         workout.setDescription(dto.getDescription());

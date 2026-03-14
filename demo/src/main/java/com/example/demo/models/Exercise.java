@@ -28,7 +28,7 @@ public class Exercise {
     @Column(nullable = false)
     private Intensity intensityLevel;
 
-    private List<String> exerciseType;
+    private String exerciseType;
     private List<String> exerciseEquipments;
 
     private Integer sequenceOrder;

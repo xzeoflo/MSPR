@@ -21,8 +21,8 @@ public class DataInitializer {
                 User admin = new User();
                 admin.setEmail(adminEmail);
                 admin.setPassword(passwordEncoder.encode("Admin@flo123"));
-                admin.setFirstname("System");
-                admin.setLastname("Administrator");
+                admin.setFirstName("System");
+                admin.setLastName("Administrator");
                 admin.setRole(UserRole.ADMIN);
                 admin.setSubscriptionTier(SubscriptionTier.PREMIUM_PLUS);
 

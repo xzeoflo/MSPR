@@ -63,8 +63,8 @@ public class User implements UserDetails {
     @Column(name = "subscription_tier")
     private SubscriptionTier subscriptionTier;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private HealthProfile healthProfile;
+    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    // private HealthProfile healthProfile;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Biometrics> biometrics = new ArrayList<>();
@@ -73,11 +73,7 @@ public class User implements UserDetails {
     private List<Meal> meals = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(
-            name = "user_workouts",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "workout_id")
-    )
+    @JoinTable(name = "user_workouts", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "workout_id"))
     private List<Workout> completedWorkouts = new ArrayList<>();
 
     public User(String email, String password, String firstName, UserRole role) {
