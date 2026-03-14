@@ -1,5 +1,7 @@
 package com.example.demo.models;
 
+import java.util.List;
+
 import com.example.demo.models.enums.Intensity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -28,7 +30,7 @@ public class Exercise {
     private Intensity intensityLevel;
 
     private String exerciseType;
-
+    private List<String> exerciseEquipments;
     private Integer sequenceOrder;
 
     @ManyToOne

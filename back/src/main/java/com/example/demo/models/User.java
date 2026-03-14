@@ -2,7 +2,10 @@ package com.example.demo.models;
 
 import com.example.demo.models.enums.SubscriptionTier;
 import com.example.demo.models.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -24,17 +27,32 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Integer id;
 
+    @Email
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String email;
 
+    @NotBlank
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
-    private String firstname;
-    private String lastname;
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     private LocalDate birthday;
+    private String gender;
+
+    @Column(name = "activity_level")
+    private String activityLevel;
+
+    private String objective;
 
     @Column(name = "partner_brand")
     private String partnerBrand;
@@ -47,18 +65,26 @@ public class User implements UserDetails {
     @Column(name = "subscription_tier")
     private SubscriptionTier subscriptionTier;
 
+    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    // private HealthProfile healthProfile;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("user")
+    private List<Biometrics> biometrics = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user")
+    private List<Eat> consumptions = new ArrayList<>();
+
     @ManyToMany
-    @JoinTable(
-            name = "user_workouts",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "workout_id")
-    )
+    @JsonIgnore
+    @JoinTable(name = "user_workouts", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "workout_id"))
     private List<Workout> completedWorkouts = new ArrayList<>();
 
-    public User(String email, String password, String firstname, UserRole role) {
+    public User(String email, String password, String firstName, UserRole role) {
         this.email = email;
         this.password = password;
-        this.firstname = firstname;
+        this.firstName = firstName;
         this.role = role;
         this.subscriptionTier = SubscriptionTier.FREEMIUM;
     }

@@ -92,4 +92,12 @@ public class UserController {
         userService.deleteUser(id, brand);
         return ResponseEntity.noContent().build();
     }
+    
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> createUser(@RequestBody User user, Principal principal) {
+        String brand = getRequestingUserPartner(principal);
+        return ResponseEntity.status(201).body(userService.createUser(user, brand));
+    }
+
 }
