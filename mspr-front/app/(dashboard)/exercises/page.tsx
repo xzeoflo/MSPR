@@ -55,8 +55,7 @@ export default function ExercisesPage() {
   if (!mounted) return null;
 
   return (
-    <div className="flex flex-1 flex-col p-4 md:p-6 lg:p-8 space-y-6">
-      {/* Header avec Actions harmonisées */}
+    <div className="flex flex-1 flex-col p-4 space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">

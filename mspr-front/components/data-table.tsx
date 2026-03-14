@@ -80,7 +80,10 @@ export function DataTable<TData extends Identifiable>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnVisibility, rowSelection, columnFilters },
+    state: {
+      sorting, columnVisibility, rowSelection, columnFilters,
+      pagination: { pageIndex: 0, pageSize: 8 }
+    },
     getRowId: (row) => row.id?.toString() || Math.random().toString(),
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
