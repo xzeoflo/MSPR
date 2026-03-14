@@ -14,15 +14,28 @@ import java.util.List;
 public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final WorkoutRepository workoutRepository;
-
     public Exercise create(Exercise exercise, String userBrand, String role) {
-        Workout workout = workoutRepository.findById(exercise.getWorkout().getId())
-                .orElseThrow(() -> new RuntimeException("Workout not found"));
+        if (exercise.getWorkout() != null && exercise.getWorkout().getId() != null) {
 
-        if (!role.equals("ADMIN") && !workout.getPartnerBrand().equals(userBrand)) {
-            throw new RuntimeException("Forbidden");
+            Workout workout = workoutRepository.findById(exercise.getWorkout().getId())
+                    .orElseThrow(() -> new RuntimeException("Workout not found"));
+
+            if (!role.equals("ADMIN") && !workout.getPartnerBrand().equals(userBrand)) {
+                throw new RuntimeException("Forbidden: You don't own this workout");
+            }
+            exercise.setWorkout(workout);
+        } else {
+            exercise.setWorkout(null);
         }
         return exerciseRepository.save(exercise);
+    }
+
+    public List<Exercise> getAll(String userBrand, String role) {
+        if ("ADMIN".equals(role)) {
+            return exerciseRepository.findAll();
+        } else {
+            return exerciseRepository.findByWorkout_PartnerBrand(userBrand);
+        }
     }
 
     public List<Exercise> getByWorkout(Integer workoutId, String userBrand, String role) {

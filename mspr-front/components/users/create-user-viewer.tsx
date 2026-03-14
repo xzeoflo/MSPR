@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { User } from "@/types/user";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,91 +22,80 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
   DrawerPortal
 } from "@/components/ui/drawer";
 
-interface UserCellViewerProps {
-  item: User;
+interface CreateUserViewerProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onUserCreated?: () => void;
 }
 
-export function UserCellViewer({ item }: UserCellViewerProps) {
+export function CreateUserViewer({ open, setOpen, onUserCreated }: CreateUserViewerProps) {
   const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = React.useState(false);
 
-  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const updatedData = Object.fromEntries(formData.entries());
+    const data = Object.fromEntries(formData.entries());
     const token = getAuthToken();
 
     try {
-      const response = await fetch(`http://localhost:8080/api/users/${item.id}`, {
-        method: "PUT",
+      const response = await fetch("http://localhost:8080/api/users", {
+        method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        console.log("User updated successfully");
-        setIsOpen(false);
-        window.location.reload();
+        setOpen(false);
+        if (onUserCreated) onUserCreated();
       } else {
-        console.error("Failed to update user:", response.status);
+        alert("Failed to create user: " + response.status);
       }
     } catch (error) {
-      console.error("Error updating user:", error);
+      alert("Error creating user: " + error);
     }
   };
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen} direction={isMobile ? "bottom" : "right"}>
-      <DrawerTrigger asChild>
-        <Button
-          variant="link"
-          type="button"
-          className="text-foreground w-fit px-0 text-left font-medium"
-        >
-          {item.firstname} {item.lastname || ""}
-        </Button>
-      </DrawerTrigger>
-
+    <Drawer open={open} onOpenChange={setOpen} direction={isMobile ? "bottom" : "right"}>
       <DrawerPortal>
         <DrawerContent
           className={isMobile ? "" : "h-screen top-0 right-0 left-auto mt-0 w-[450px] rounded-none"}
-          onOpenAutoFocus={(e) => e.preventDefault()}
+          onOpenAutoFocus={e => e.preventDefault()}
         >
           <DrawerHeader className="gap-1">
-            <DrawerTitle>User Profile</DrawerTitle>
+            <DrawerTitle>Create User</DrawerTitle>
             <DrawerDescription>
-              Update detailed information for {item.firstname}.
+              Fill in the details to create a new user.
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
             {!isMobile && <Separator className="my-2" />}
 
-            <form id="edit-user-form" onSubmit={handleSave} className="flex flex-col gap-6 py-4">
+            <form id="create-user-form" onSubmit={handleCreate} className="flex flex-col gap-6 py-4">
               <div className="space-y-4">
                 <h4 className="text-sm font-bold text-primary italic">Identity</h4>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="firstname" className="text-xs font-semibold uppercase text-muted-foreground">First Name</Label>
-                    <Input id="firstname" name="firstname" defaultValue={item.firstname} required />
+                    <Input id="firstname" name="firstname" required />
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="lastname" className="text-xs font-semibold uppercase text-muted-foreground">Last Name</Label>
-                    <Input id="lastname" name="lastname" defaultValue={item.lastname || ""} />
+                    <Input id="lastname" name="lastname" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <div className="flex flex-col gap-2 sm:col-span-2">
                     <Label htmlFor="email" className="text-xs font-semibold uppercase text-muted-foreground">Email</Label>
-                    <Input id="email" name="email" type="email" defaultValue={item.email} required />
+                    <Input id="email" name="email" type="email" required />
                   </div>
                 </div>
               </div>
@@ -119,19 +107,14 @@ export function UserCellViewer({ item }: UserCellViewerProps) {
 
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="partnerBrand" className="text-xs font-semibold uppercase text-muted-foreground">Partner Brand</Label>
-                  <Input
-                    id="partnerBrand"
-                    name="partnerBrand"
-                    defaultValue={item.partnerBrand || ""}
-                    placeholder="E.g.: Nike, Amazon, etc."
-                  />
+                  <Input id="partnerBrand" name="partnerBrand" placeholder="E.g.: Nike, Amazon, etc." />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="role" className="text-xs font-semibold uppercase text-muted-foreground">Role</Label>
-                    <Select name="role" defaultValue={item.role}>
-                      <SelectTrigger id="role"><SelectValue /></SelectTrigger>
+                    <Select name="role" defaultValue="CLIENT" required>
+                      <SelectTrigger id="role"><SelectValue placeholder="Select role" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="ADMIN">Administrator</SelectItem>
                         <SelectItem value="COACH">Coach</SelectItem>
@@ -141,8 +124,8 @@ export function UserCellViewer({ item }: UserCellViewerProps) {
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="subscriptionTier" className="text-xs font-semibold uppercase text-muted-foreground">Subscription</Label>
-                    <Select name="subscriptionTier" defaultValue={item.subscriptionTier || "FREEMIUM"}>
-                      <SelectTrigger id="subscriptionTier"><SelectValue /></SelectTrigger>
+                    <Select name="subscriptionTier" defaultValue="FREEMIUM">
+                      <SelectTrigger id="subscriptionTier"><SelectValue placeholder="Select subscription" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="FREEMIUM">Freemium</SelectItem>
                         <SelectItem value="PREMIUM">Premium</SelectItem>
@@ -156,9 +139,9 @@ export function UserCellViewer({ item }: UserCellViewerProps) {
           </div>
 
           <DrawerFooter className="pt-4 border-t">
-            <Button type="submit" form="edit-user-form">Save Changes</Button>
+            <Button type="submit" form="create-user-form">Create User</Button>
             <DrawerClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" type="button">Cancel</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>

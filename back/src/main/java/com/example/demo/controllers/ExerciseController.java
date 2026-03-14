@@ -23,15 +23,24 @@ public class ExerciseController {
         return ResponseEntity.ok(exerciseService.create(exercise, user.getPartnerBrand(), user.getRole().name()));
     }
 
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
+    public ResponseEntity<List<Exercise>> getAll(Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return ResponseEntity.ok(exerciseService.getAll(user.getPartnerBrand(), user.getRole().name()));
+    }
+
     @GetMapping("/workout/{workoutId}")
     public ResponseEntity<List<Exercise>> getByWorkout(@PathVariable Integer workoutId, Authentication auth) {
         User user = (User) auth.getPrincipal();
-        return ResponseEntity.ok(exerciseService.getByWorkout(workoutId, user.getPartnerBrand(), user.getRole().name()));
+        return ResponseEntity
+                .ok(exerciseService.getByWorkout(workoutId, user.getPartnerBrand(), user.getRole().name()));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
-    public ResponseEntity<Exercise> update(@PathVariable Integer id, @RequestBody Exercise exercise, Authentication auth) {
+    public ResponseEntity<Exercise> update(@PathVariable Integer id, @RequestBody Exercise exercise,
+            Authentication auth) {
         User user = (User) auth.getPrincipal();
         return ResponseEntity.ok(exerciseService.update(id, exercise, user.getPartnerBrand(), user.getRole().name()));
     }

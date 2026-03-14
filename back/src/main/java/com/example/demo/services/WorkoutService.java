@@ -49,8 +49,9 @@ public class WorkoutService {
     }
 
     public Workout createWorkout(Workout workout, String requestingUserPartnerBrand) {
-        workout.setPartnerBrand(requestingUserPartnerBrand);
-
+        if (requestingUserPartnerBrand != null && !requestingUserPartnerBrand.isEmpty()) {
+            workout.setPartnerBrand(requestingUserPartnerBrand);
+        }
         if (workout.getExercises() != null && !workout.getExercises().isEmpty()) {
             String expectedType = workout.getWorkoutType().name();
 
@@ -81,6 +82,23 @@ public class WorkoutService {
         workout.setDescription(details.getDescription());
         workout.setDifficulty(details.getDifficulty());
         workout.setWorkoutType(details.getWorkoutType());
+
+        if (details.getExercises() != null) {
+            workout.getExercises().clear();
+
+            String expectedType = workout.getWorkoutType().name();
+
+            for (Exercise exercise : details.getExercises()) {
+                if (expectedType != null && !expectedType.equalsIgnoreCase(exercise.getExerciseType())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Type mismatch for exercise: " + exercise.getName());
+                }
+
+                exercise.setWorkout(workout);
+                workout.getExercises().add(exercise);
+            }
+        }
+
         return workoutRepository.save(workout);
     }
 

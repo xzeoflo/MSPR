@@ -6,13 +6,10 @@ import {
   IconUsers,
   IconBarbell,
   IconStretching,
-  IconSettings,
-  IconHelp,
-  IconSearch,
+  IconDownload,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -25,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Rat } from "lucide-react";
 import Link from "next/link";
-import { getAuthToken, getCurrentUser } from "@/lib/auth";
+import { getAuthToken } from "@/lib/auth";
 
 const menuData = {
   navMain: [
@@ -33,12 +30,8 @@ const menuData = {
     { title: "Users", url: "/users", icon: IconUsers },
     { title: "Workouts", url: "/workouts", icon: IconBarbell },
     { title: "Exercises", url: "/exercises", icon: IconStretching },
-  ],
-  navSecondary: [
-    { title: "Settings", url: "#", icon: IconSettings },
-    { title: "Get Help", url: "#", icon: IconHelp },
-    { title: "Search", url: "#", icon: IconSearch },
-  ],
+    { title: "Import", url: "/import", icon: IconDownload }
+  ]
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -67,7 +60,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         if (response.ok) {
           const user = await response.json();
-          console.log("User data from /me:", user);
 
           const fname = user.firstname;
           const lname = user.lastname;
@@ -92,14 +84,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     fetchConnectedUser();
   }, []);
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="p-1.5">
               <Link href="/">
                 <Rat className="text-primary" />
-                <span className="text-base font-semibold">HealthAI</span>
+                <span className="text-base font-semibold">HealthAI Coach</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -108,7 +100,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent>
         <NavMain items={menuData.navMain} />
-        <NavSecondary items={menuData.navSecondary} className="mt-auto" />
       </SidebarContent>
 
       <SidebarFooter>

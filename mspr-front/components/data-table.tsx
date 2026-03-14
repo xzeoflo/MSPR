@@ -80,7 +80,10 @@ export function DataTable<TData extends Identifiable>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnVisibility, rowSelection, columnFilters },
+    state: {
+      sorting, columnVisibility, rowSelection, columnFilters,
+      pagination: { pageIndex: 0, pageSize: 8 }
+    },
     getRowId: (row) => row.id?.toString() || Math.random().toString(),
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -193,8 +196,7 @@ export function DataTable<TData extends Identifiable>({
 
         <div className="flex items-center justify-between mt-4 px-2">
           <div className="text-[11px] text-muted-foreground font-medium uppercase italic">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            {table.getFilteredRowModel().rows.length} row(s).
           </div>
           <div className="flex items-center gap-4">
             <span className="text-xs font-medium text-muted-foreground">

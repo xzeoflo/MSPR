@@ -1,7 +1,8 @@
+"use client";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@/types/user";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { IconDotsVertical, IconLoader2 } from "@tabler/icons-react";
 import {
@@ -10,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { DragHandle } from "../drag-handle";
 import { UserCellViewer } from "./user-cell-viewer";
 import { useState } from "react";
 import { getAuthToken } from "@/lib/auth";
@@ -65,21 +65,9 @@ const ActionCell = ({ user }: { user: User }) => {
 
 export const columns: ColumnDef<User>[] = [
   {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
-    ),
+    id: "_blank",
+    header: "",
+    cell: () => <div className="w-2" />,
     enableSorting: false,
     enableHiding: false,
   },
@@ -127,7 +115,11 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "subscriptionTier",
     header: "Subscription",
-    cell: ({ row }) => <Badge variant="outline">{row.original.subscriptionTier || "FREE"}</Badge>,
+    cell: ({ row }) => (
+      <Badge variant="outline" className="text-[10px] font-bold">
+        {row.original.subscriptionTier || "FREE"}
+      </Badge>
+    ),
   },
   {
     id: "actions",

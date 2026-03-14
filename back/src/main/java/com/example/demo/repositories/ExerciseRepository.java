@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Integer> {
     List<Exercise> findByWorkoutId(Integer workoutId);
+    List<Exercise> findByWorkout_PartnerBrand(String partnerBrand);
+
 }
