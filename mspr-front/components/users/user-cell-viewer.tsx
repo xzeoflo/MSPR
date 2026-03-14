@@ -71,7 +71,7 @@ export function UserCellViewer({ item }: UserCellViewerProps) {
           type="button"
           className="text-foreground w-fit px-0 text-left font-medium"
         >
-          {item.firstname} {item.lastname || ""}
+          {item.firstName} {item.lastName || ""}
         </Button>
       </DrawerTrigger>
 
@@ -83,7 +83,7 @@ export function UserCellViewer({ item }: UserCellViewerProps) {
           <DrawerHeader className="gap-1">
             <DrawerTitle>User Profile</DrawerTitle>
             <DrawerDescription>
-              Update detailed information for {item.firstname}.
+              Update detailed information for {item.firstName}.
             </DrawerDescription>
           </DrawerHeader>
 
@@ -96,11 +96,11 @@ export function UserCellViewer({ item }: UserCellViewerProps) {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="firstname" className="text-xs font-semibold uppercase text-muted-foreground">First Name</Label>
-                    <Input id="firstname" name="firstname" defaultValue={item.firstname} required />
+                    <Input id="firstname" name="firstname" defaultValue={item.firstName} required />
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="lastname" className="text-xs font-semibold uppercase text-muted-foreground">Last Name</Label>
-                    <Input id="lastname" name="lastname" defaultValue={item.lastname || ""} />
+                    <Input id="lastname" name="lastname" defaultValue={item.lastName || ""} />
                   </div>
                 </div>
 

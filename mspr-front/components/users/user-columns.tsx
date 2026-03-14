@@ -32,7 +32,7 @@ const ActionCell = ({ user }: { user: User }) => {
       });
 
       if (response.ok) {
-        toast.success(`User ${user.firstname} deleted`);
+        toast.success(`User ${user.firstName} deleted`);
         window.location.reload();
       } else {
         toast.error("Failed to delete user");
@@ -72,9 +72,21 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "firstname",
+    accessorKey: "firstName",
     header: "User",
-    cell: ({ row }) => <UserCellViewer item={row.original} />,
+    cell: ({ row }) => {
+      const user = row.original;
+
+      if (!user.firstName) {
+        return <span className="text-muted-foreground italic">No name</span>;
+      }
+
+      return (
+        <div className="flex items-center gap-2">
+          <UserCellViewer item={user} />
+        </div>
+      );
+    },
     enableHiding: false,
   },
   {
@@ -88,7 +100,7 @@ export const columns: ColumnDef<User>[] = [
         CLIENT: "bg-emerald-700 text-white border-emerald-600",
       };
       return (
-        <div className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase border ${variants[role]}`}>
+        <div className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase border ${variants[role] || "bg-gray-500"}`}>
           {role}
         </div>
       );
