@@ -52,7 +52,7 @@ export function MealCellViewer({ item, onMealUpdated }: MealCellViewerProps) {
       sugarG: parseFloat(rawData.sugarG as string) || 0,
       sodiumMg: parseFloat(rawData.sodiumMg as string) || 0,
       cholesterolMg: parseFloat(rawData.cholesterolMg as string) || 0,
-      partnerBrand: item.partnerBrand,
+      partnerBrand: rawData.partnerBrand === "" ? null : rawData.partnerBrand,
     };
 
     try {
