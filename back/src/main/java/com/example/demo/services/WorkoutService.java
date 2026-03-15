@@ -6,14 +6,15 @@ import com.example.demo.models.Workout;
 import com.example.demo.models.User;
 import com.example.demo.repositories.WorkoutRepository;
 import com.example.demo.repositories.UserRepository;
+import com.example.demo.repositories.ExerciseRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import com.example.demo.dto.WorkoutDTO;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
-
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -22,12 +23,16 @@ public class WorkoutService {
 
     private final WorkoutRepository workoutRepository;
     private final UserRepository userRepository;
+    private final ExerciseRepository exerciseRepository;
     private final WorkoutMapper workoutMapper;
 
-    public WorkoutService(WorkoutRepository workoutRepository, UserRepository userRepository,
+    public WorkoutService(WorkoutRepository workoutRepository,
+            UserRepository userRepository,
+            ExerciseRepository exerciseRepository,
             WorkoutMapper workoutMapper) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
+        this.exerciseRepository = exerciseRepository;
         this.workoutMapper = workoutMapper;
     }
 
@@ -48,24 +53,20 @@ public class WorkoutService {
         return workout;
     }
 
+    @Transactional
     public Workout createWorkout(Workout workout, String requestingUserPartnerBrand) {
         if (requestingUserPartnerBrand != null && !requestingUserPartnerBrand.isEmpty()) {
             workout.setPartnerBrand(requestingUserPartnerBrand);
         }
-        if (workout.getExercises() != null && !workout.getExercises().isEmpty()) {
-            String expectedIntensity = workout.getWorkoutType().toString();
 
-            for (Exercise exercise : workout.getExercises()) {
-                if (expectedIntensity != null
-                        && !expectedIntensity.equalsIgnoreCase(exercise.getIntensityLevel().toString())) {
-                    throw new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST,
-                            "Incohérence de type : L'exercice '" + exercise.getName() + "' est d'intensité ["
-                                    + exercise.getIntensityLevel().toString() + "] mais le workout est d'intensité ["
-                                    + expectedIntensity + "].");
-                }
-                exercise.setWorkout(workout);
-            }
+        if (workout.getExercises() != null && !workout.getExercises().isEmpty()) {
+            List<Exercise> managedExercises = workout.getExercises().stream()
+                    .map(ex -> exerciseRepository.findByName(ex.getName())
+                            .orElseGet(() -> exerciseRepository.save(ex)))
+                    .collect(Collectors.toList());
+
+            workout.setExercises(managedExercises);
+            validateWorkoutCoherence(workout);
         }
         return workoutRepository.save(workout);
     }
@@ -83,20 +84,16 @@ public class WorkoutService {
         workout.setDescription(details.getDescription());
         workout.setDifficulty(details.getDifficulty());
         workout.setWorkoutType(details.getWorkoutType());
+        workout.setPartnerBrand(details.getPartnerBrand());
+
         if (details.getExercises() != null) {
             workout.getExercises().clear();
-
-            String expectedType = workout.getWorkoutType().name();
-
-            for (Exercise exercise : details.getExercises()) {
-                if (expectedType != null && !expectedType.equalsIgnoreCase(exercise.getExerciseType())) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Type mismatch for exercise: " + exercise.getName());
-                }
-
-                exercise.setWorkout(workout);
-                workout.getExercises().add(exercise);
+            for (Exercise ex : details.getExercises()) {
+                Exercise managedEx = exerciseRepository.findByName(ex.getName())
+                        .orElseGet(() -> exerciseRepository.save(ex));
+                workout.getExercises().add(managedEx);
             }
+            validateWorkoutCoherence(workout);
         }
 
         return workoutRepository.save(workout);
@@ -105,12 +102,25 @@ public class WorkoutService {
     @Transactional
     public void deleteWorkout(Integer id, String userBrand, String role) {
         Workout workout = workoutRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Workout not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout not found"));
 
-        if (!role.equals("ADMIN") && !workout.getPartnerBrand().equals(userBrand)) {
-            throw new RuntimeException("Access Denied: Brand mismatch");
+        String cleanRole = role.replace("ROLE_", "");
+
+        if (cleanRole.equals("ADMIN")) {
+            workoutRepository.delete(workout);
+            return;
         }
-        workoutRepository.delete(workout);
+
+        if (cleanRole.equals("COACH")) {
+            boolean isSameBrand = workout.getPartnerBrand() != null && workout.getPartnerBrand().equals(userBrand);
+            if (isSameBrand) {
+                workoutRepository.delete(workout);
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied: Brand mismatch");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied: Role not authorized");
+        }
     }
 
     public List<Workout> getWorkoutsByAgeRange(int minAge, int maxAge, String requestingUserPartnerBrand) {
@@ -141,7 +151,6 @@ public class WorkoutService {
 
     public List<Workout> getWorkoutsByMaxDuration(int maxMinutes, String requestingUserPartnerBrand) {
         int maxSeconds = maxMinutes * 60;
-
         return getAllWorkouts(requestingUserPartnerBrand).stream()
                 .filter(w -> w.getTotalDurationInSeconds() <= maxSeconds)
                 .collect(Collectors.toList());
@@ -180,12 +189,8 @@ public class WorkoutService {
     }
 
     public List<WorkoutDTO> exportWorkouts(String brand) {
-        List<Workout> workouts;
-        if (brand == null) {
-            workouts = workoutRepository.findAll();
-        } else {
-            workouts = workoutRepository.findByPartnerBrand(brand);
-        }
+        List<Workout> workouts = (brand == null) ? workoutRepository.findAll()
+                : workoutRepository.findByPartnerBrand(brand);
         return workouts.stream()
                 .map(workoutMapper::toDTO)
                 .collect(Collectors.toList());
@@ -196,18 +201,30 @@ public class WorkoutService {
         for (WorkoutDTO dto : dtos) {
             dto.setPartnerBrand(brand);
             Workout entity = workoutMapper.toEntity(dto);
+            if (entity.getExercises() != null) {
+                List<Exercise> managed = entity.getExercises().stream()
+                        .map(ex -> exerciseRepository.findByName(ex.getName())
+                                .orElseGet(() -> exerciseRepository.save(ex)))
+                        .toList();
+                entity.setExercises(managed);
+            }
             validateWorkoutCoherence(entity);
             workoutRepository.save(entity);
         }
     }
 
     private void validateWorkoutCoherence(Workout workout) {
-        if (workout.getExercises() != null) {
-            String expectedIntensity = workout.getWorkoutType().toString();
+        if (workout.getExercises() != null && workout.getWorkoutType() != null) {
+            String expectedType = workout.getWorkoutType().toString();
+
             workout.getExercises().forEach(ex -> {
-                if (expectedIntensity != null
-                        && !expectedIntensity.equalsIgnoreCase(ex.getIntensityLevel().toString())) {
-                    throw new IllegalArgumentException("Type mismatch for exercise: " + ex.getName());
+                if (ex.getExerciseType() != null &&
+                        !expectedType.equalsIgnoreCase(ex.getExerciseType().toString())) {
+
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Incohérence : L'exercice '" + ex.getName() +
+                                    "' (Type: " + ex.getExerciseType() +
+                                    ") ne correspond pas au type du workout (" + expectedType + ").");
                 }
             });
         }

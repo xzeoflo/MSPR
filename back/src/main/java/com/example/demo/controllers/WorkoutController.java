@@ -4,7 +4,11 @@ import com.example.demo.dto.WorkoutDTO;
 import com.example.demo.models.Workout;
 import com.example.demo.models.User;
 import com.example.demo.services.WorkoutService;
+
+import jakarta.validation.Valid;
+
 import com.example.demo.services.UserService;
+import com.example.demo.mappers.WorkoutMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,10 +23,12 @@ public class WorkoutController {
 
     private final WorkoutService workoutService;
     private final UserService userService;
+    private final WorkoutMapper workoutMapper;
 
-    public WorkoutController(WorkoutService workoutService, UserService userService) {
+    public WorkoutController(WorkoutService workoutService, UserService userService, WorkoutMapper workoutMapper) {
         this.workoutService = workoutService;
         this.userService = userService;
+        this.workoutMapper = workoutMapper;
     }
 
     private String getRequestingUserPartner(Principal principal) {
@@ -51,15 +57,18 @@ public class WorkoutController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
-    public ResponseEntity<Workout> createWorkout(@RequestBody Workout workout, Principal principal) {
+    public ResponseEntity<Workout> createWorkout(@Valid @RequestBody WorkoutDTO workoutDto, Principal principal) {
         String brand = getRequestingUserPartner(principal);
+        Workout workout = workoutMapper.toEntity(workoutDto);
         return ResponseEntity.ok(workoutService.createWorkout(workout, brand));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
-    public ResponseEntity<Workout> update(@PathVariable Integer id, @RequestBody Workout workout, Authentication auth) {
+    public ResponseEntity<Workout> update(@PathVariable Integer id, @RequestBody WorkoutDTO workoutDto,
+            Authentication auth) {
         User user = (User) auth.getPrincipal();
+        Workout workout = workoutMapper.toEntity(workoutDto);
         return ResponseEntity
                 .ok(workoutService.updateWorkout(id, workout, user.getPartnerBrand(), user.getRole().name()));
     }

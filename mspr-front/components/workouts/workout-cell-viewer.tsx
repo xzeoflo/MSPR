@@ -52,7 +52,7 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
     const fetchExercises = async () => {
       try {
         const token = getAuthToken();
-        const res = await fetch("http://localhost:8080/api/v1/exercises", {
+        const res = await fetch("http://localhost:8080/api/exercises", {
           headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
@@ -76,7 +76,8 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
         ...prev,
         {
           ...ex,
-          id: undefined,
+          // On garde l'ID s'il vient de la base pour que le backend sache quoi lier
+          id: ex.id,
           sequenceOrder: prev.length + 1
         }
       ]);
@@ -96,20 +97,28 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
     const formData = new FormData(event.currentTarget);
     const token = getAuthToken();
 
+    const totalDuration = selectedExercises.reduce((sum, ex) => sum + (ex.durationInSeconds || 0), 0);
+    const totalCalories = selectedExercises.reduce((sum, ex) => sum + (ex.caloriesBurned || 0), 0);
+
     const payload = {
       ...item,
       title: formData.get("title"),
       description: formData.get("description"),
       difficulty: formData.get("difficulty"),
       workoutType: workoutType,
-      partnerBrand: formData.get("partnerBrand") || null,
+      partnerBrand: formData.get("partnerBrand")?.toString() || "",
+      totalDuration: totalDuration,
+      totalCalories: totalCalories,
       exercises: selectedExercises.map((ex, index) => ({
         ...ex,
         id: ex.id || null,
         sequenceOrder: index + 1,
         exerciseType: workoutType,
+        intensityLevel: ex.intensityLevel?.toUpperCase() || "BEGINNER"
       }))
     };
+
+    delete (payload as any).totalDurationInSeconds;
 
     try {
       const res = await fetch(`http://localhost:8080/api/workouts/${item.id}`, {
@@ -121,19 +130,18 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Update failed on server");
-
-      setIsOpen(false);
-
-      if (onWorkoutUpdated) {
-        onWorkoutUpdated();
+      if (!res.ok) {
+        const errorMsg = await res.text();
+        throw new Error(errorMsg || "Update failed on server");
       }
 
+      setIsOpen(false);
+      if (onWorkoutUpdated) onWorkoutUpdated();
       router.refresh();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Update error:", error);
-      alert("Error updating workout. Please check your network or server logs.");
+      alert("Error updating workout: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -177,6 +185,7 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Difficulty</Label>
+                  {/* Ajout de l'attribut name pour FormData */}
                   <Select name="difficulty" defaultValue={item.difficulty}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -189,7 +198,9 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
                 </div>
                 <div className="space-y-2">
                   <Label>Type</Label>
-                  <Select value={workoutType} onValueChange={setWorkoutType}>
+                  <Select value={workoutType} onValueChange={(val) => {
+                    setWorkoutType(val);
+                  }}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="STRENGTH">Strength</SelectItem>
@@ -245,7 +256,7 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 opacity-0 group-hover:opacity-100 text-destructive transition-opacity"
+                          className="h-7 w-7 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-destructive transition-opacity"
                           onClick={() => handleRemoveExercise(idx)}
                         >
                           <Trash2 className="h-4 w-4" />

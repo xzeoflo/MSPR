@@ -27,7 +27,7 @@ const ActionCell = ({ exercise, onRefresh }: { exercise: Exercise; onRefresh: ()
     const token = getAuthToken();
 
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/exercises/${exercise.id}`, {
+      const response = await fetch(`http://localhost:8080/api/exercises/${exercise.id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,

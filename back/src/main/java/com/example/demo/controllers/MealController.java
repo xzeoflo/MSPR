@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/meals")

@@ -1,9 +1,10 @@
 package com.example.demo.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.demo.models.enums.Intensity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,11 +31,15 @@ public class Exercise {
     private Intensity intensityLevel;
 
     private String exerciseType;
+
+    @ElementCollection
+    @CollectionTable(name = "exercise_equipments", joinColumns = @JoinColumn(name = "exercise_id"))
+    @Column(name = "equipment_name")
     private List<String> exerciseEquipments;
+
     private Integer sequenceOrder;
 
-    @ManyToOne
-    @JoinColumn(name = "workout_id")
-    @JsonBackReference
-    private Workout workout;
+    @ManyToMany(mappedBy = "exercises")
+    @JsonIgnoreProperties("exercises")
+    private List<Workout> workouts = new ArrayList<>();
 }

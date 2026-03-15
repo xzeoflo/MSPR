@@ -61,13 +61,13 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
       sets: parseInt(rawData.sets as string) || 0,
       caloriesBurned: parseInt(rawData.caloriesBurned as string) || 0,
       sequenceOrder: 0,
-      workout: null, // Pour éviter le NullPointerException que tu avais
+      workout: null,
     };
 
     const token = getAuthToken();
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/exercises", {
+      const response = await fetch("http://localhost:8080/api/exercises", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

@@ -1,34 +1,25 @@
 import { z } from "zod";
-import { exerciseSchema } from "./exercise"; // Importe le schéma de l'exercice
+import { exerciseSchema } from "./exercise";
 
 export const workoutSchema = z.object({
   id: z.number().optional(),
+
   title: z.string().min(1, "Le titre est requis"),
-  description: z.string().min(1, "La description est requise"),
-  totalDurationInSeconds: z.number().optional(),
+
+  description: z.string().optional().nullable(),
+
   difficulty: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED", "NIGHTMARE"]),
-  workoutType: z.string().min(1, "Le type de workout est requis"),
-  exercises: z.array(exerciseSchema).default([]),
+
+  workoutType: z.enum(["CARDIO", "STRENGTH", "HIIT", "CORE", "FLEXIBILITY"]),
+
+  totalDurationInSeconds: z.number().nonnegative().default(0),
+  totalCaloriesBurned: z.number().nonnegative().default(0),
+
+  exercises: z.array(exerciseSchema).min(1, "Le workout doit contenir au moins 1 exercice"),
+
   exerciseType: z.string().optional(),
   partnerBrand: z.string().optional().nullable(),
   createdAt: z.string().optional(),
 });
 
 export type Workout = z.infer<typeof workoutSchema>;
-
-/**
- * Interface pour les statistiques d'âge (utilisé dans /stats/age)
- */
-export interface WorkoutAgeStats {
-  minAge: number;
-  maxAge: number;
-  count: number;
-}
-
-/**
- * Interface pour le DTO d'export/import (utilisé dans /export et /import)
- */
-// export interface WorkoutDTO extends Workout {
-//   // Ajoute ici des champs spécifiques au DTO si nécessaire
-//   // comme des métadonnées d'exportation
-// }

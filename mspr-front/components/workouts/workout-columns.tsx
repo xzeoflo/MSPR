@@ -25,7 +25,6 @@ const ActionCell = ({ workout, onRefresh }: { workout: Workout; onRefresh: () =>
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete "${workout.title}"?`)) return;
 
     setIsDeleting(true);
     const token = getAuthToken();
@@ -113,7 +112,7 @@ export const getColumns = (fetchWorkouts: () => void): ColumnDef<Workout>[] => [
     },
   },
   {
-    accessorKey: "totalDurationInSeconds",
+    accessorKey: "totalDuration",
     header: "Duration",
     cell: ({ row }) => {
       const totalSeconds: number = row.original.totalDurationInSeconds ?? 0;

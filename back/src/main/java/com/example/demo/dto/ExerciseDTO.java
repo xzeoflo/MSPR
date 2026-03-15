@@ -25,7 +25,7 @@ public class ExerciseDTO {
     @PositiveOrZero(message = "calories must be positive")
     private Integer caloriesBurned = 0;
 
-    @Pattern(regexp = "^(BEGINNER|INTERMEDIATE|ADVANCED|NIGHTMARE)$", message = "Intensity must be BEGINNER, INTERMEDIATE, ADVANCED or NIGHTMARE")
+    @NotNull(message = "Intensity is required")
     private Intensity intensityLevel;
 
     @NotBlank(message = "exerciseType is required")

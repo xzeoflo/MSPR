@@ -24,7 +24,7 @@ export default function ExercisesPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("http://localhost:8080/api/v1/exercises", {
+      const response = await fetch("http://localhost:8080/api/exercises", {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",

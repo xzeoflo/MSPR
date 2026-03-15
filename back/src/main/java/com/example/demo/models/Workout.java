@@ -1,7 +1,8 @@
 package com.example.demo.models;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.example.demo.models.enums.WorkoutType;
+import com.example.demo.models.enums.Intensity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,16 +22,21 @@ public class Workout {
 
     private String title;
     private String description;
-    private String difficulty;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WorkoutType workoutType;;
+    private Intensity difficulty;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private WorkoutType workoutType;
 
     @Column(name = "partner_brand")
     private String partnerBrand;
 
-    @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(name = "workout_exercises", joinColumns = @JoinColumn(name = "workout_id"), inverseJoinColumns = @JoinColumn(name = "exercise_id"))
+    @JsonIgnoreProperties("workouts")
     private List<Exercise> exercises = new ArrayList<>();
 
     @Transient

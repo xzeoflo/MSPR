@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.util.List;
 
+import com.example.demo.models.enums.Intensity;
 import com.example.demo.models.enums.WorkoutType;
 
 @Data
@@ -13,10 +14,10 @@ public class WorkoutDTO {
 
     private String description;
 
-    @Pattern(regexp = "^(Beginner|Intermediate|Advanced)$", message = "Difficulty invalid")
-    private String difficulty;
+    @NotNull(message = "Difficulty is required")
+    private Intensity difficulty;
 
-    @NotBlank(message = "workoutType is required")
+    @NotNull(message = "workoutType is required")
     private WorkoutType workoutType;
 
     private String partnerBrand;
