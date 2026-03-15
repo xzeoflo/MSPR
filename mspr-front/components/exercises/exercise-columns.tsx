@@ -18,6 +18,7 @@ import {
 import { useState } from "react";
 import { getAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
+import { ExerciseCellViewer } from "./exercise-cell-viewer";
 
 const ActionCell = ({ exercise, onRefresh }: { exercise: Exercise; onRefresh: () => void }) => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -85,7 +86,7 @@ export const getColumns = (fetchExercises: () => void): ColumnDef<Exercise>[] =>
   {
     id: "_blank",
     header: "",
-    cell: () => <div className="w-2" />, // Espace vide pour le style
+    cell: () => <div className="w-2" />,
     enableSorting: false,
     enableHiding: false,
   },
@@ -93,9 +94,10 @@ export const getColumns = (fetchExercises: () => void): ColumnDef<Exercise>[] =>
     accessorKey: "name",
     header: "Exercise",
     cell: ({ row }) => (
-      <span className="font-bold text-sm tracking-tight text-foreground/90">
-        {row.getValue("name")}
-      </span>
+      <ExerciseCellViewer
+        item={row.original}
+        onExerciseUpdated={fetchExercises}
+      />
     ),
   },
   {
