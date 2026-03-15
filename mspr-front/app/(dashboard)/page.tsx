@@ -1,35 +1,37 @@
+"use client";
+
 import { DistributionDonut } from "@/components/dashboard";
 import { BrandsBarChart } from "@/components/bar-chart";
 
-
 export default function DashboardPage() {
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <DistributionDonut
-              title="Users"
-              description="Répartition des membres"
-              endpoint="/stats/users-distribution"
-            />
-            <DistributionDonut
-              title="Workouts"
-              description="Par type de séance"
-              endpoint="/stats/types"
-            />
-            <DistributionDonut
-              title="Exercises"
-              description="Types d'exercices"
-              endpoint="/stats/exercises-distribution"
-            />
-          </div>
-          <BrandsBarChart />
-          <div className="px-4 lg:px-6">
-          </div>
-        </div>
+    <div className="flex flex-1 flex-col p-4  space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <DistributionDonut
+          title="Users"
+          description="Distribution des utilisateurs"
+          endpoint="/stats/users-distribution"
+        />
+        <DistributionDonut
+          title="Workouts"
+          description="Distribution des types de workout"
+          endpoint="/stats/types"
+        />
+        <DistributionDonut
+          title="Exercises"
+          description="Distribution des exercices"
+          endpoint="/stats/exercises-distribution"
+        />
+        <DistributionDonut
+          title="Meals Brands"
+          description="Repas par marque"
+          endpoint="/stats/meals-brands"
+        />
       </div>
+
+
+      <h3 className="text-sm font-bold mb-4">Comparaison Globale des Marques</h3>
+      <BrandsBarChart />
     </div>
   );
 }

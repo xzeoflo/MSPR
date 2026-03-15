@@ -40,15 +40,24 @@ public class MealService {
         Meal meal = mealRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if (requestingUserPartnerBrand != null && !requestingUserPartnerBrand.equals(meal.getPartnerBrand())) {
+        if (requestingUserPartnerBrand == null) {
+            return meal;
+        }
+
+        if (meal.getPartnerBrand() != null && !requestingUserPartnerBrand.equals(meal.getPartnerBrand())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
         return meal;
     }
 
     public Meal createMeal(Meal meal, String requestingUserPartnerBrand) {
         if (requestingUserPartnerBrand != null) {
             meal.setPartnerBrand(requestingUserPartnerBrand);
+        } else {
+            if (meal.getPartnerBrand() == null || meal.getPartnerBrand().isEmpty()) {
+                meal.setPartnerBrand("Internal");
+            }
         }
         return mealRepository.save(meal);
     }
