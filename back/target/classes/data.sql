@@ -1,7 +1,7 @@
 -- ==========================================================
 -- 0. CLEAN (Ordre respecté pour les clés étrangères)
 -- ==========================================================
-TRUNCATE eat, exercises, workouts, meals, users RESTART IDENTITY CASCADE;
+-- TRUNCATE eat, exercises, workouts, meals, users RESTART IDENTITY CASCADE;
 
 -- ==========================================================
 -- 1. USERS
