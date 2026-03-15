@@ -7,6 +7,7 @@ import {
   IconBarbell,
   IconStretching,
   IconDownload,
+  IconMeat,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -30,6 +31,7 @@ const menuData = {
     { title: "Users", url: "/users", icon: IconUsers },
     { title: "Workouts", url: "/workouts", icon: IconBarbell },
     { title: "Exercises", url: "/exercises", icon: IconStretching },
+    { title: "Meals", url: "/meals", icon: IconMeat },
     { title: "Import", url: "/import", icon: IconDownload }
   ]
 };

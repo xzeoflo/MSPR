@@ -175,7 +175,7 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
                   <Textarea
                     id="description"
                     name="description"
-                    defaultValue={item.description}
+                    defaultValue={item.description ?? ""}
                     className="min-h-[80px] resize-none"
                     required
                   />
@@ -185,7 +185,6 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Difficulty</Label>
-                  {/* Ajout de l'attribut name pour FormData */}
                   <Select name="difficulty" defaultValue={item.difficulty}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>

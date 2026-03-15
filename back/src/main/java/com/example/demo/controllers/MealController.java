@@ -25,6 +25,13 @@ public class MealController {
 
     private String getRequestingUserPartner(Principal principal) {
         if (principal instanceof Authentication authentication) {
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ADMIN"));
+
+            if (isAdmin) {
+                return null;
+            }
+
             Object userPrincipal = authentication.getPrincipal();
             if (userPrincipal instanceof User user) {
                 return user.getPartnerBrand();

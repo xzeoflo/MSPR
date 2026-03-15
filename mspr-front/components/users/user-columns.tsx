@@ -120,7 +120,7 @@ export const columns: ColumnDef<User>[] = [
     header: "Partner Brand",
     cell: ({ row }) => (
       <div className="text-sm italic text-muted-foreground">
-        {row.original.partnerBrand || "Independent"}
+        {row.original.partnerBrand || "Internal"}
       </div>
     ),
   },

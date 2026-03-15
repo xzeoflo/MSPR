@@ -25,7 +25,6 @@ public class ExerciseService {
         if ("ADMIN".equals(role)) {
             return exerciseRepository.findAll();
         } else {
-            // Changement ici : findByWorkouts_PartnerBrand
             return exerciseRepository.findByWorkouts_PartnerBrand(userBrand);
         }
     }
@@ -37,7 +36,6 @@ public class ExerciseService {
         if (!role.equals("ADMIN") && !workout.getPartnerBrand().equals(userBrand)) {
             throw new RuntimeException("Forbidden");
         }
-        // Changement ici : findByWorkouts_Id
         return exerciseRepository.findByWorkouts_Id(workoutId);
     }
 

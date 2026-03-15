@@ -1,9 +1,11 @@
 package com.example.demo.controllers;
 
+import com.example.demo.models.Meal;
 import com.example.demo.models.User;
 import com.example.demo.models.Workout;
 import com.example.demo.models.Exercise;
 import com.example.demo.services.ExerciseService;
+import com.example.demo.services.MealService;
 import com.example.demo.services.UserService;
 import com.example.demo.services.WorkoutService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class DashboardController {
     private final UserService userService;
     private final WorkoutService workoutService;
     private final ExerciseService exerciseService;
+    private final MealService mealService;
 
     /**
      * Retourne les compteurs rapides (Users, Workouts, Exercises)
@@ -36,17 +39,20 @@ public class DashboardController {
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<Map<String, Long>> getQuickStats(Authentication auth) {
         User user = (User) auth.getPrincipal();
-        String brand = user.getPartnerBrand();
+        // Pour l'admin global, on passe null pour tout voir
+        String brand = ("ADMIN".equals(user.getRole().name())) ? null : user.getPartnerBrand();
         String role = user.getRole().name();
 
         long userCount = userService.getAllUsers(brand).size();
         long workoutCount = workoutService.getAllWorkouts(brand).size();
         long exerciseCount = exerciseService.getAll(brand, role).size();
+        long mealCount = mealService.getAllMeals(brand).size(); // <-- Nouveau compteur
 
         return ResponseEntity.ok(Map.of(
                 "totalUsers", userCount,
                 "totalWorkouts", workoutCount,
-                "totalExercises", exerciseCount));
+                "totalExercises", exerciseCount,
+                "totalMeals", mealCount)); // <-- Ajout à la réponse
     }
 
     /**
@@ -60,6 +66,43 @@ public class DashboardController {
 
         Map<String, Long> counts = workouts.stream()
                 .collect(Collectors.groupingBy(w -> w.getWorkoutType().toString().toLowerCase(),
+                        Collectors.counting()));
+
+        return ResponseEntity.ok(mapToChartData(counts));
+    }
+
+    /**
+     * Répartition des Repas par type (mealType)
+     */
+    @GetMapping("/stats/meals-types")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
+    public ResponseEntity<List<Map<String, Object>>> getMealTypeStats(Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        // On récupère le brand pour filtrer les repas accessibles
+        String brand = ("ADMIN".equals(user.getRole().name())) ? null : user.getPartnerBrand();
+
+        List<Meal> meals = mealService.getAllMeals(brand);
+
+        Map<String, Long> counts = meals.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getMealType() != null ? m.getMealType().toLowerCase() : "autre",
+                        Collectors.counting()));
+
+        return ResponseEntity.ok(mapToChartData(counts));
+    }
+
+    /**
+     * Répartition des Repas par Marque (Admin seulement)
+     */
+    @GetMapping("/stats/meals-brands")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Map<String, Object>>> getMealBrandDistribution() {
+        // En tant qu'admin global, on récupère TOUS les repas (brand null)
+        List<Meal> allMeals = mealService.getAllMeals(null);
+
+        Map<String, Long> counts = allMeals.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getPartnerBrand() != null ? m.getPartnerBrand() : "Internal",
                         Collectors.counting()));
 
         return ResponseEntity.ok(mapToChartData(counts));
@@ -83,7 +126,7 @@ public class DashboardController {
         if ("ADMIN".equals(role)) {
             counts = allUsers.stream()
                     .collect(Collectors.groupingBy(
-                            u -> u.getPartnerBrand() != null ? u.getPartnerBrand() : "Sans Marque",
+                            u -> u.getPartnerBrand() != null ? u.getPartnerBrand() : "Internal",
                             Collectors.counting()));
         } else {
             counts = allUsers.stream()
@@ -115,8 +158,9 @@ public class DashboardController {
     @GetMapping("/stats/brands-comparison")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Map<String, Object>>> getBrandsComparison() {
-        List<Workout> allWorkouts = workoutService.getAllWorkouts(null); 
+        List<Workout> allWorkouts = workoutService.getAllWorkouts(null);
         List<User> allUsers = userService.getAllUsers(null);
+        List<Meal> allMeals = mealService.getAllMeals(null);
 
         Map<String, Long> workoutsByBrand = allWorkouts.stream()
                 .filter(w -> w.getPartnerBrand() != null)
@@ -126,17 +170,22 @@ public class DashboardController {
                 .filter(u -> u.getPartnerBrand() != null)
                 .collect(Collectors.groupingBy(User::getPartnerBrand, Collectors.counting()));
 
-        List<Map<String, Object>> chartData = new ArrayList<>();
+        Map<String, Long> mealsByBrand = allMeals.stream()
+                .filter(m -> m.getPartnerBrand() != null)
+                .collect(Collectors.groupingBy(Meal::getPartnerBrand, Collectors.counting()));
 
+        List<Map<String, Object>> chartData = new ArrayList<>();
         java.util.Set<String> brands = new java.util.HashSet<>();
         brands.addAll(workoutsByBrand.keySet());
         brands.addAll(usersByBrand.keySet());
+        brands.addAll(mealsByBrand.keySet());
 
         for (String brand : brands) {
             Map<String, Object> row = new HashMap<>();
             row.put("brand", brand);
             row.put("workouts", workoutsByBrand.getOrDefault(brand, 0L));
             row.put("users", usersByBrand.getOrDefault(brand, 0L));
+            row.put("meals", mealsByBrand.getOrDefault(brand, 0L));
             chartData.add(row);
         }
 
