@@ -3,6 +3,9 @@ package com.example.demo.mappers;
 import com.example.demo.models.enums.Intensity;
 import com.example.demo.dto.ExerciseDTO;
 import com.example.demo.models.Exercise;
+
+import java.util.ArrayList;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,7 +23,10 @@ public class ExerciseMapper {
         dto.setCaloriesBurned(entity.getCaloriesBurned());
         dto.setIntensityLevel(entity.getIntensityLevel());
         dto.setExerciseType(entity.getExerciseType());
-        dto.setSequenceOrder(entity.getSequenceOrder());
+        dto.setExerciseEquipments(
+                entity.getExerciseEquipments() != null ? new ArrayList<>(entity.getExerciseEquipments())
+                        : new ArrayList<>());
+
         return dto;
     }
 
@@ -37,7 +43,8 @@ public class ExerciseMapper {
         exercise.setCaloriesBurned(dto.getCaloriesBurned() != null ? dto.getCaloriesBurned() : 0);
         exercise.setIntensityLevel(dto.getIntensityLevel() != null ? dto.getIntensityLevel() : Intensity.INTERMEDIATE);
         exercise.setExerciseType(dto.getExerciseType());
-        exercise.setSequenceOrder(dto.getSequenceOrder() != null ? dto.getSequenceOrder() : 1);
+        exercise.setExerciseEquipments(
+                dto.getExerciseEquipments() != null ? new ArrayList<>(dto.getExerciseEquipments()) : new ArrayList<>());
 
         return exercise;
     }

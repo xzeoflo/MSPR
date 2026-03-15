@@ -91,29 +91,12 @@ public class WorkoutController {
         return ResponseEntity.ok(workoutService.getWorkoutsByAgeRange(min, max, brand));
     }
 
-    @GetMapping("/filter/time")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
     public ResponseEntity<List<Workout>> getWorkoutsByTime(
             @RequestParam int maxMinutes,
             Principal principal) {
         String brand = getRequestingUserPartner(principal);
         return ResponseEntity.ok(workoutService.getWorkoutsByMaxDuration(maxMinutes, brand));
-    }
-
-    @GetMapping("/filter/intensity")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
-    public ResponseEntity<List<Workout>> getWorkoutsByIntensity(
-            @RequestParam String level,
-            Principal principal) {
-        String brand = getRequestingUserPartner(principal);
-        return ResponseEntity.ok(workoutService.getWorkoutsIntensity(level, brand));
-    }
-
-    @GetMapping("/history/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
-    public ResponseEntity<List<Workout>> getUserHistory(@PathVariable Integer userId, Principal principal) {
-        String brand = getRequestingUserPartner(principal);
-        return ResponseEntity.ok(userService.getCompletedWorkouts(userId, brand));
     }
 
     @GetMapping("/filter/exerciseType")
@@ -125,26 +108,6 @@ public class WorkoutController {
         return ResponseEntity.ok(workoutService.getWorkoutsByExerciseType(type, brand));
     }
 
-    @GetMapping("/filter/workoutType")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
-    public ResponseEntity<List<Workout>> getWorkoutsByWType(
-            @RequestParam String type,
-            Principal principal) {
-        String brand = getRequestingUserPartner(principal);
-        return ResponseEntity.ok(workoutService.getWorkoutsByType(type, brand));
-    }
-
-    @GetMapping("/filter/pure")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COACH', 'CLIENT')")
-    public ResponseEntity<List<Workout>> getPureWorkouts(
-            @RequestParam String workoutType,
-            @RequestParam String exerciseType,
-            Principal principal) {
-        String brand = getRequestingUserPartner(principal);
-        return ResponseEntity.ok(workoutService.getWorkoutByTypeAndIntensity(workoutType, exerciseType, brand));
-    }
-
-    @GetMapping("/export")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<List<WorkoutDTO>> exportWorkouts(Principal principal) {
         String brand = getRequestingUserPartner(principal);
@@ -157,21 +120,4 @@ public class WorkoutController {
                 .body(data);
     }
 
-    @PostMapping("/import")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
-    public ResponseEntity<String> importWorkouts(
-            @RequestBody List<WorkoutDTO> workoutDTOs,
-            Authentication auth) {
-
-        User user = (User) auth.getPrincipal();
-        String brand = user.getPartnerBrand();
-
-        try {
-            workoutService.importWorkouts(workoutDTOs, brand);
-            return ResponseEntity.ok("Importation réussie de " + workoutDTOs.size() + " workouts.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("Erreur lors de l'import : " + e.getMessage());
-        }
-    }
 }

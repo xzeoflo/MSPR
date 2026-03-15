@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.example.demo.dto.UserExportDTO;
+import com.example.demo.mappers.DataMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -135,5 +137,12 @@ public class UserService {
     public List<Workout> getCompletedWorkouts(Integer userId, String requestingUserPartnerBrand) {
         User user = getUserById(userId, requestingUserPartnerBrand);
         return user.getCompletedWorkouts();
+    }
+
+    
+    public List<UserExportDTO> exportAllUsers() {
+        return userRepository.findAll().stream()
+                .map(DataMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

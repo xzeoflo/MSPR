@@ -2,7 +2,7 @@ package com.example.demo.models;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.example.demo.models.enums.DataStatus;
 import com.example.demo.models.enums.Intensity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -31,6 +31,9 @@ public class Exercise {
     private Intensity intensityLevel;
 
     private String exerciseType;
+
+    @Enumerated(EnumType.STRING)
+    private DataStatus status = DataStatus.APPROVED;
 
     @ElementCollection
     @CollectionTable(name = "exercise_equipments", joinColumns = @JoinColumn(name = "exercise_id"))

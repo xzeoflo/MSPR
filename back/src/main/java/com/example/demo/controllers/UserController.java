@@ -1,7 +1,9 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.UserExportDTO;
 import com.example.demo.models.User;
 import com.example.demo.services.UserService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -92,7 +94,7 @@ public class UserController {
         userService.deleteUser(id, brand);
         return ResponseEntity.noContent().build();
     }
-    
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> createUser(@RequestBody User user, Principal principal) {
@@ -100,4 +102,9 @@ public class UserController {
         return ResponseEntity.status(201).body(userService.createUser(user, brand));
     }
 
+    @GetMapping("/export")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserExportDTO>> exportUsers() {
+        return ResponseEntity.ok(userService.exportAllUsers());
+    }
 }
