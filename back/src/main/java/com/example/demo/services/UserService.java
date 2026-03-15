@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.UserExportDTO;
+import com.example.demo.mappers.DataMapper;
 import com.example.demo.models.User;
 import com.example.demo.models.Workout;
 import com.example.demo.repositories.UserRepository;
@@ -135,5 +137,11 @@ public class UserService {
     public List<Workout> getCompletedWorkouts(Integer userId, String requestingUserPartnerBrand) {
         User user = getUserById(userId, requestingUserPartnerBrand);
         return user.getCompletedWorkouts();
+    }
+
+    public List<UserExportDTO> exportAllUsers() {
+        return userRepository.findAll().stream()
+                .map(DataMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

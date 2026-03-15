@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.MealExportDTO;
+import com.example.demo.mappers.DataMapper;
 import com.example.demo.models.Eat;
 import com.example.demo.models.Meal;
 import com.example.demo.models.User;
@@ -12,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MealService {
@@ -96,5 +99,17 @@ public class MealService {
     public void deleteMeal(Integer id, String requestingUserPartnerBrand) {
         Meal meal = getMealById(id, requestingUserPartnerBrand);
         mealRepository.delete(meal);
+    }
+
+    public List<MealExportDTO> exportMeals(String brand, String role) {
+        List<Meal> meals;
+        if ("ADMIN".equals(role)) {
+            meals = mealRepository.findAll();
+        } else {
+            meals = mealRepository.findByPartnerBrand(brand);
+        }
+        return meals.stream()
+                .map(DataMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

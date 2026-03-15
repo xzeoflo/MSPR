@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.MealExportDTO;
 import com.example.demo.models.Meal;
 import com.example.demo.models.User;
 import com.example.demo.services.MealService;
@@ -81,5 +82,12 @@ public class MealController {
         String brand = getRequestingUserPartner(principal);
         mealService.deleteMeal(id, brand);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/export")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
+    public ResponseEntity<List<MealExportDTO>> exportMeals(Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return ResponseEntity.ok(mealService.exportMeals(user.getPartnerBrand(), user.getRole().name()));
     }
 }

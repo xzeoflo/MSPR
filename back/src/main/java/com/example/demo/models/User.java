@@ -65,8 +65,8 @@ public class User implements UserDetails {
     @Column(name = "subscription_tier")
     private SubscriptionTier subscriptionTier;
 
-    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    // private HealthProfile healthProfile;
+     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+     private HealthProfile healthProfile;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("user")

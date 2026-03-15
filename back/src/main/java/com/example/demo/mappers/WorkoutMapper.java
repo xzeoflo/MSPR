@@ -1,10 +1,15 @@
 package com.example.demo.mappers;
 
 import com.example.demo.dto.WorkoutDTO;
+import com.example.demo.dto.ExerciseDTO;
 import com.example.demo.models.Workout;
+import com.example.demo.models.Exercise;
+import com.example.demo.models.Includes;
 import com.example.demo.models.enums.Intensity;
 import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -28,11 +33,11 @@ public class WorkoutMapper {
         dto.setPartnerBrand(entity.getPartnerBrand());
 
         dto.setTotalCalories(entity.getTotalCaloriesBurned());
-        dto.setTotalDuration(entity.getTotalDurationInSeconds());
+        dto.setTotalDuration(entity.getTotalDurationInMinutes());
 
-        if (entity.getExercises() != null) {
-            dto.setExercises(entity.getExercises().stream()
-                    .map(exerciseMapper::toDTO)
+        if (entity.getIncludedExercises() != null) {
+            dto.setExercises(entity.getIncludedExercises().stream()
+                    .map(inc -> exerciseMapper.toDTO(inc.getExercise()))
                     .collect(Collectors.toList()));
         }
         return dto;
@@ -50,12 +55,20 @@ public class WorkoutMapper {
         workout.setPartnerBrand(dto.getPartnerBrand());
 
         if (dto.getExercises() != null && !dto.getExercises().isEmpty()) {
-            workout.setExercises(dto.getExercises().stream()
-                    .map(exDto -> {
-
-                        return exerciseMapper.toEntity(exDto);
-                    })
-                    .collect(Collectors.toCollection(ArrayList::new)));
+            List<Includes> includesList = new ArrayList<>();
+            int order = 1;
+            for (ExerciseDTO exDto : dto.getExercises()) {
+                Exercise ex = exerciseMapper.toEntity(exDto);
+                if (ex != null) {
+                    Includes include = new Includes();
+                    include.setExercise(ex);
+                    include.setWorkout(workout);
+                    include.setSequenceOrder(order);
+                    includesList.add(include);
+                    order++;
+                }
+            }
+            workout.setIncludedExercises(includesList);
         }
         return workout;
     }

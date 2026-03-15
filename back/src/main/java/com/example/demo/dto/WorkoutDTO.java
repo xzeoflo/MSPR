@@ -9,6 +9,7 @@ import com.example.demo.models.enums.WorkoutType;
 
 @Data
 public class WorkoutDTO {
+
     @NotBlank(message = "title is required")
     private String title;
 

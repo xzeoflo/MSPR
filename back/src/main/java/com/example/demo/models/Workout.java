@@ -2,8 +2,6 @@ package com.example.demo.models;
 
 import com.example.demo.models.enums.WorkoutType;
 import com.example.demo.models.enums.Intensity;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,30 +32,32 @@ public class Workout {
     @Column(name = "partner_brand")
     private String partnerBrand;
 
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinTable(name = "workout_exercises", joinColumns = @JoinColumn(name = "workout_id"), inverseJoinColumns = @JoinColumn(name = "exercise_id"))
-    @JsonIgnoreProperties("workouts")
-    private List<Exercise> exercises = new ArrayList<>();
+    @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sequenceOrder ASC")
+    private List<Includes> includedExercises = new ArrayList<>();
 
     @Transient
     public Integer getTotalCaloriesBurned() {
-        if (exercises == null || exercises.isEmpty()) {
+        if (includedExercises == null || includedExercises.isEmpty()) {
             return 0;
         }
-        return exercises.stream()
-                .map(Exercise::getCaloriesBurned)
-                .filter(cal -> cal != null)
-                .reduce(0, Integer::sum);
+        return includedExercises.stream()
+                .map(Includes::getExercise)
+                .filter(ex -> ex != null && ex.getCaloriesBurned() != null)
+                .mapToInt(Exercise::getCaloriesBurned)
+                .sum();
     }
 
     @Transient
-    public Integer getTotalDurationInSeconds() {
-        if (exercises == null || exercises.isEmpty()) {
+    public Integer getTotalDurationInMinutes() {
+        if (includedExercises == null || includedExercises.isEmpty()) {
             return 0;
         }
-        return exercises.stream()
-                .map(Exercise::getDurationInSeconds)
-                .filter(dur -> dur != null)
-                .reduce(0, Integer::sum);
+        int totalSeconds = includedExercises.stream()
+                .map(Includes::getExercise)
+                .filter(ex -> ex != null && ex.getDurationInSeconds() != null)
+                .mapToInt(Exercise::getDurationInSeconds)
+                .sum();
+        return totalSeconds / 60;
     }
 }

@@ -3,8 +3,8 @@ package com.example.demo.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.demo.models.enums.DataStatus;
 import com.example.demo.models.enums.Intensity;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,14 +32,14 @@ public class Exercise {
 
     private String exerciseType;
 
+    @Enumerated(EnumType.STRING)
+    private DataStatus status = DataStatus.APPROVED;
+
     @ElementCollection
     @CollectionTable(name = "exercise_equipments", joinColumns = @JoinColumn(name = "exercise_id"))
     @Column(name = "equipment_name")
     private List<String> exerciseEquipments;
 
-    private Integer sequenceOrder;
-
-    @ManyToMany(mappedBy = "exercises")
-    @JsonIgnoreProperties("exercises")
-    private List<Workout> workouts = new ArrayList<>();
+    @OneToMany(mappedBy = "exercise")
+    private List<Includes> workoutsIncludingThis = new ArrayList<>();
 }

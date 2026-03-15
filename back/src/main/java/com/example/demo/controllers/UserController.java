@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.UserExportDTO;
 import com.example.demo.models.User;
 import com.example.demo.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -98,6 +99,12 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user, Principal principal) {
         String brand = getRequestingUserPartner(principal);
         return ResponseEntity.status(201).body(userService.createUser(user, brand));
+    }
+
+    @GetMapping("/export")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserExportDTO>> exportUsers() {
+        return ResponseEntity.ok(userService.exportAllUsers());
     }
 
 }

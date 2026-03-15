@@ -1,9 +1,9 @@
 package com.example.demo.dto;
 
 import com.example.demo.models.enums.Intensity;
-
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class ExerciseDTO {
@@ -30,6 +30,8 @@ public class ExerciseDTO {
 
     @NotBlank(message = "exerciseType is required")
     private String exerciseType;
+
+    private List<String> exerciseEquipments;
 
     @Min(1)
     private Integer sequenceOrder;

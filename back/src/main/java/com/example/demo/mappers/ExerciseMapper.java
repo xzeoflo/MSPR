@@ -4,13 +4,14 @@ import com.example.demo.models.enums.Intensity;
 import com.example.demo.dto.ExerciseDTO;
 import com.example.demo.models.Exercise;
 import org.springframework.stereotype.Component;
+import java.util.ArrayList;
 
 @Component
 public class ExerciseMapper {
 
     public ExerciseDTO toDTO(Exercise entity) {
-        if (entity == null)
-            return null;
+        if (entity == null) return null;
+
         ExerciseDTO dto = new ExerciseDTO();
         dto.setName(entity.getName());
         dto.setDescription(entity.getDescription());
@@ -20,15 +21,16 @@ public class ExerciseMapper {
         dto.setCaloriesBurned(entity.getCaloriesBurned());
         dto.setIntensityLevel(entity.getIntensityLevel());
         dto.setExerciseType(entity.getExerciseType());
-        dto.setSequenceOrder(entity.getSequenceOrder());
+        dto.setExerciseEquipments(entity.getExerciseEquipments() != null ?
+                new ArrayList<>(entity.getExerciseEquipments()) : new ArrayList<>());
+
         return dto;
     }
 
     public Exercise toEntity(ExerciseDTO dto) {
-        if (dto == null)
-            return null;
-        Exercise exercise = new Exercise();
+        if (dto == null) return null;
 
+        Exercise exercise = new Exercise();
         exercise.setName(dto.getName() != null ? dto.getName() : "Sans nom");
         exercise.setDescription(dto.getDescription());
         exercise.setDurationInSeconds(dto.getDurationInSeconds() != null ? dto.getDurationInSeconds() : 0);
@@ -37,7 +39,8 @@ public class ExerciseMapper {
         exercise.setCaloriesBurned(dto.getCaloriesBurned() != null ? dto.getCaloriesBurned() : 0);
         exercise.setIntensityLevel(dto.getIntensityLevel() != null ? dto.getIntensityLevel() : Intensity.INTERMEDIATE);
         exercise.setExerciseType(dto.getExerciseType());
-        exercise.setSequenceOrder(dto.getSequenceOrder() != null ? dto.getSequenceOrder() : 1);
+        exercise.setExerciseEquipments(dto.getExerciseEquipments() != null ?
+                new ArrayList<>(dto.getExerciseEquipments()) : new ArrayList<>());
 
         return exercise;
     }
