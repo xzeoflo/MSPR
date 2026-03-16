@@ -2,9 +2,11 @@ package com.example.demo.repositories;
 
 import com.example.demo.models.Exercise;
 import com.example.demo.models.enums.DataStatus;
+
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 

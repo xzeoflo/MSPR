@@ -3,9 +3,7 @@ package com.example.demo.services;
 import com.example.demo.models.Exercise;
 import com.example.demo.dto.ExerciseDTO;
 import com.example.demo.mappers.ExerciseMapper;
-
 import com.example.demo.models.Workout;
-
 import com.example.demo.models.enums.DataStatus;
 import com.example.demo.repositories.ExerciseRepository;
 import com.example.demo.repositories.WorkoutRepository;
@@ -14,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,14 +24,23 @@ public class ExerciseService {
     private final ExerciseMapper exerciseMapper;
 
     public Exercise create(Exercise exercise, String userBrand, String role) {
+        exercise.setStatus(DataStatus.APPROVED);
+        exercise.setOriginSource("MANUAL");
         return exerciseRepository.save(exercise);
     }
 
     public List<Exercise> getAll(String userBrand, String role) {
-        if ("ADMIN".equals(role.replace("ROLE_", ""))) {
-            return exerciseRepository.findAll();
+        String cleanRole = role.replace("ROLE_", "");
+
+        List<Exercise> allApproved = exerciseRepository.findByStatus(DataStatus.APPROVED);
+
+        if ("ADMIN".equals(cleanRole)) {
+            return allApproved;
         } else {
-            return exerciseRepository.findByWorkouts_PartnerBrand(userBrand);
+            return allApproved.stream()
+                    .filter(ex -> ex.getWorkouts().stream()
+                            .anyMatch(w -> w.getPartnerBrand().equals(userBrand)))
+                    .collect(Collectors.toList());
         }
     }
 
@@ -47,9 +53,24 @@ public class ExerciseService {
     @Transactional
     public void importExercises(List<ExerciseDTO> dtos) {
         List<Exercise> exercises = dtos.stream()
+                .filter(this::isValidForImport)
                 .map(exerciseMapper::toEntity)
+                .peek(ex -> {
+                    ex.setStatus(DataStatus.PENDING);
+                    ex.setOriginSource("JSON_IMPORT");
+                })
                 .collect(Collectors.toList());
+
+        if (exercises.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucun exercice valide trouvé dans le JSON.");
+        }
+
         exerciseRepository.saveAll(exercises);
+    }
+
+    private boolean isValidForImport(ExerciseDTO dto) {
+        return dto.getName() != null && !dto.getName().trim().isEmpty()
+                && dto.getIntensityLevel() != null;
     }
 
     public List<Exercise> getByWorkout(Integer workoutId, String userBrand, String role) {
@@ -95,7 +116,6 @@ public class ExerciseService {
     public void rejectExercise(Integer id) {
         Exercise exercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Exercice non trouvé"));
-
         exercise.setStatus(DataStatus.REJECTED);
         exerciseRepository.save(exercise);
     }
@@ -110,7 +130,9 @@ public class ExerciseService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercice non trouvé"));
 
         exercise.setName(updateDetails.getName());
-        exercise.setDescription(updateDetails.getDescription());
+        if (updateDetails.getDescription() != null) {
+            exercise.setDescription(updateDetails.getDescription());
+        }
         exercise.setExerciseType(updateDetails.getExerciseType());
         exercise.setIntensityLevel(updateDetails.getIntensityLevel());
         exercise.setCaloriesBurned(updateDetails.getCaloriesBurned());

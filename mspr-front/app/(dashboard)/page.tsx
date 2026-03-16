@@ -23,15 +23,11 @@ export default function DashboardPage() {
           endpoint="/stats/exercises-distribution"
         />
         <DistributionDonut
-          title="Meals Brands"
-          description="Repas par marque"
-          endpoint="/stats/meals-brands"
+          title="Meal Types"
+          description="Distribution by category"
+          endpoint="/stats/meals-types"
         />
       </div>
-
-
-      <h3 className="text-sm font-bold mb-4">Comparaison Globale des Marques</h3>
-      <BrandsBarChart />
     </div>
   );
 }

@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/drawer";
 import { Trash2, Clock } from "lucide-react";
 
-type Intensity = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "NIGHTMARE";
+type Intensity = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
 
 interface Exercise {
   id: number;
@@ -187,9 +187,11 @@ export function CreateWorkoutViewer({ open, setOpen, onWorkoutCreated }: { open:
                     <SelectContent>
                       <SelectItem value="STRENGTH">Strength</SelectItem>
                       <SelectItem value="CARDIO">Cardio</SelectItem>
-                      <SelectItem value="HIIT">HIIT</SelectItem>
-                      <SelectItem value="CORE">Core</SelectItem>
-                      <SelectItem value="FLEXIBILITY">Flexibility</SelectItem>
+                      <SelectItem value="STRONGMAN">Strongman</SelectItem>
+                      <SelectItem value="STRETCHING">Stretching</SelectItem>
+                      <SelectItem value="POWERLIFTING">Powerlifting</SelectItem>
+                      <SelectItem value="PLYOMETRICS">Plyometrics</SelectItem>
+                      <SelectItem value="OLYMPIC_WEIGHTLIFTING">Olympic Weightlifting</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -204,7 +206,6 @@ export function CreateWorkoutViewer({ open, setOpen, onWorkoutCreated }: { open:
                       <SelectItem value="BEGINNER">Beginner</SelectItem>
                       <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                       <SelectItem value="ADVANCED">Advanced</SelectItem>
-                      <SelectItem value="NIGHTMARE">Nightmare</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

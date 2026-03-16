@@ -8,9 +8,9 @@ export const workoutSchema = z.object({
 
   description: z.string().optional().nullable(),
 
-  difficulty: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED", "NIGHTMARE"]),
+  difficulty: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]),
 
-  workoutType: z.enum(["CARDIO", "STRENGTH", "HIIT", "CORE", "FLEXIBILITY"]),
+  workoutType: z.enum(["CARDIO", "STRENGTH", "STRONGMAN", "STRETCHING", "POWERLIFTING", "PLYOMETRICS", "OLYMPIC_WEIGHTLIFTING"]),
 
   totalDurationInSeconds: z.number().nonnegative().default(0),
   totalCaloriesBurned: z.number().nonnegative().default(0),

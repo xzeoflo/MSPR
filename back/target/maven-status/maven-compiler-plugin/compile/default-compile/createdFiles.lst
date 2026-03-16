@@ -31,6 +31,7 @@ com/example/demo/config/ApplicationConfig.class
 com/example/demo/models/enums/WorkoutType.class
 com/example/demo/repositories/ExerciseRepository.class
 com/example/demo/services/WorkoutService.class
+com/example/demo/config/RestConfig.class
 com/example/demo/dto/external/ExternalApiResponse.class
 com/example/demo/config/JwtAuthenticationFilter.class
 com/example/demo/MsprApplication.class

@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { getAuthToken } from "@/lib/auth";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge"; // Import des badges
+import { IconPlus, IconX, IconBarbell } from "@tabler/icons-react"; // Import des icônes
 import {
   Select,
   SelectContent,
@@ -29,10 +31,13 @@ import {
 const EXERCISE_TYPES = [
   { label: "Cardio", value: "CARDIO" },
   { label: "Strength", value: "STRENGTH" },
-  { label: "Flexibility", value: "FLEXIBILITY" },
-  { label: "Hiit", value: "HIIT" },
-  { label: "Core", value: "CORE" },
+  { label: "Strongman", value: "STRONGMAN" },
+  { label: "Stretching", value: "STRETCHING" },
+  { label: "Powerlifting", value: "POWERLIFTING" },
+  { label: "Plyometrics", value: "PLYOMETRICS" },
+  { label: "Olympic Weightlifting", value: "OLYMPIC WEIGHTLIFTING" },
 ];
+
 const INTENSITY_LEVELS = [
   { label: "Beginner", value: "BEGINNER" },
   { label: "Intermediate", value: "INTERMEDIATE" },
@@ -49,6 +54,30 @@ interface CreateExerciseViewerProps {
 export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: CreateExerciseViewerProps) {
   const isMobile = useIsMobile();
 
+  // ÉTATS POUR LES ÉQUIPEMENTS
+  const [equipments, setEquipments] = React.useState<string[]>([]);
+  const [equipmentInput, setEquipmentInput] = React.useState("");
+
+  // On reset les champs quand le drawer s'ouvre/ferme
+  React.useEffect(() => {
+    if (!open) {
+      setEquipments([]);
+      setEquipmentInput("");
+    }
+  }, [open]);
+
+  const addEquipment = () => {
+    const val = equipmentInput.trim();
+    if (val && !equipments.includes(val)) {
+      setEquipments([...equipments, val]);
+      setEquipmentInput("");
+    }
+  };
+
+  const removeEquipment = (name: string) => {
+    setEquipments(equipments.filter(e => e !== name));
+  };
+
   const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -60,6 +89,7 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
       repetitions: parseInt(rawData.repetitions as string) || 0,
       sets: parseInt(rawData.sets as string) || 0,
       caloriesBurned: parseInt(rawData.caloriesBurned as string) || 0,
+      exerciseEquipments: equipments.length > 0 ? equipments : ["None"], // Ajout des équipements
       sequenceOrder: 0,
       workout: null,
     };
@@ -102,7 +132,7 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
+          <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm flex-1">
             {!isMobile && <Separator className="my-2" />}
 
             <form id="create-exercise-form" onSubmit={handleCreate} className="flex flex-col gap-6 py-4">
@@ -114,7 +144,6 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
                   <Input id="name" name="name" placeholder="e.g. Bench Press" required />
                 </div>
 
-                {/* REMPLACEMENT DE L'INPUT PAR UN SELECT POUR LE TYPE */}
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="exerciseType" className="text-xs font-semibold uppercase text-muted-foreground">Type</Label>
                   <Select name="exerciseType" defaultValue="STRENGTH" required>
@@ -123,9 +152,7 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
                     </SelectTrigger>
                     <SelectContent>
                       {EXERCISE_TYPES.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
+                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -134,6 +161,51 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="description" className="text-xs font-semibold uppercase text-muted-foreground">Description</Label>
                   <Textarea id="description" name="description" placeholder="Describe the movement..." className="min-h-[80px]" required />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* SECTION EQUIPMENTS AJOUTÉE */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-primary italic">Equipment Required</h4>
+                  <IconBarbell size={18} className="text-muted-foreground" />
+                </div>
+
+                <div className="flex flex-wrap gap-2 min-h-[20px]">
+                  {equipments.map((eq) => (
+                    <Badge key={eq} variant="secondary" className="pl-2 pr-1 py-1 gap-1 bg-zinc-900 border-zinc-800 text-zinc-300">
+                      {eq}
+                      <button
+                        type="button"
+                        onClick={() => removeEquipment(eq)}
+                        className="rounded-full hover:bg-zinc-800 p-0.5 transition-colors"
+                      >
+                        <IconX size={12} />
+                      </button>
+                    </Badge>
+                  ))}
+                  {equipments.length === 0 && (
+                    <span className="text-zinc-500 italic text-xs">Bodyweight (No equipment)</span>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add: Barbell, Bench, etc."
+                    value={equipmentInput}
+                    onChange={(e) => setEquipmentInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addEquipment();
+                      }
+                    }}
+                  />
+                  <Button type="button" variant="outline" size="icon" onClick={addEquipment}>
+                    <IconPlus size={18} />
+                  </Button>
                 </div>
               </div>
 
@@ -149,9 +221,7 @@ export function CreateExerciseViewer({ open, setOpen, onExerciseCreated }: Creat
                       <SelectTrigger id="intensityLevel"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {INTENSITY_LEVELS.map((level) => (
-                          <SelectItem key={level.value} value={level.value}>
-                            {level.label}
-                          </SelectItem>
+                          <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

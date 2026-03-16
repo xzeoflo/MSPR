@@ -32,7 +32,8 @@ const menuData = {
     { title: "Workouts", url: "/workouts", icon: IconBarbell },
     { title: "Exercises", url: "/exercises", icon: IconStretching },
     { title: "Meals", url: "/meals", icon: IconMeat },
-    { title: "Import", url: "/import", icon: IconDownload }
+    { title: "Import Exercises", url: "/import-exercises", icon: IconDownload },
+    { title: "Import Meals", url: "/import-meals", icon: IconDownload },
   ]
 };
 

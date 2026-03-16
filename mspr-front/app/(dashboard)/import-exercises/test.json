@@ -1,0 +1,13 @@
+[
+  {
+    "name": "",
+    "exerciseType": "STRENGTH",
+    "intensityLevel": null,
+    "caloriesBurned": -500
+  },
+  {
+    "name": "Exercice Mystère",
+    "exerciseType": null,
+    "intensityLevel": "UNKNOWN_VALUE"
+  }
+]

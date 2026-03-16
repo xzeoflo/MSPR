@@ -24,6 +24,7 @@ public class DataMapper {
 
     public static MealExportDTO toDto(Meal meal) {
         MealExportDTO dto = new MealExportDTO();
+        dto.setName(meal.getName());
         dto.setMealType(meal.getMealType());
         dto.setQuantityG(meal.getQuantityG());
         dto.setAllergies(meal.getAllergies());
@@ -31,7 +32,6 @@ public class DataMapper {
         dto.setProteinG(meal.getProteinG());
         dto.setCarbsG(meal.getCarbsG());
         dto.setFatsG(meal.getFatsG());
-        dto.setPartnerBrand(meal.getPartnerBrand());
         return dto;
     }
 }

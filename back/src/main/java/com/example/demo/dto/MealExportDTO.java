@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class MealExportDTO {
+    private String name;
     private String mealType;
     private Double quantityG;
     private String allergies;
@@ -13,7 +14,4 @@ public class MealExportDTO {
     private Double fiberG;
     private Double fatsG;
     private Double sugarG;
-    private Double sodiumMg;
-    private Double cholesterolMg;
-    private String partnerBrand;
 }

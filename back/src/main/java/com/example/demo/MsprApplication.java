@@ -9,7 +9,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+        org.springframework.boot.autoconfigure.http.client.HttpClientAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration.class
+})
 @EnableMethodSecurity
 @EnableScheduling
 public class MsprApplication {

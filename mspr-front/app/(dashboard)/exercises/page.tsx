@@ -5,17 +5,17 @@ import { DataTable } from "@/components/data-table";
 import { getColumns } from "@/components/exercises/exercise-columns";
 import { getAuthToken } from "@/lib/auth";
 import { Exercise } from "@/types/exercise";
-import { IconAlertCircle, IconLoader2, IconRefresh, IconPlus } from "@tabler/icons-react";
+import { IconAlertCircle, IconLoader2, IconRefresh, IconPlus, IconDownload } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { CreateExerciseViewer } from "@/components/exercises/create-exercises-viewer";
 import { Separator } from "@/components/ui/separator";
+import { handleExport } from "@/hooks/use-exercise-moderation";
 
 export default function ExercisesPage() {
   const [data, setData] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [createOpen, setCreateOpen] = useState(false);
 
   const fetchExercises = useCallback(async () => {
@@ -31,16 +31,12 @@ export default function ExercisesPage() {
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
       const jsonData = await response.json();
       setData(Array.isArray(jsonData) ? jsonData : []);
-
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
-      console.error("[Fetch Error]:", errorMessage);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -56,6 +52,7 @@ export default function ExercisesPage() {
 
   return (
     <div className="flex flex-1 flex-col p-4 space-y-5">
+      {/* HEADER & ACTIONS BAR */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -71,6 +68,7 @@ export default function ExercisesPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Refresh Button */}
           <Button
             variant="outline"
             size="icon"
@@ -86,6 +84,20 @@ export default function ExercisesPage() {
 
           <Separator orientation="vertical" className="h-6 mx-1 hidden sm:block" />
 
+          {/* Export Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExport}
+            className="h-9 gap-2 px-4 shadow-sm border-zinc-800"
+          >
+            <IconDownload size={18} />
+            <span className="font-semibold text-xs uppercase tracking-tight text-muted-foreground">
+              Export JSON
+            </span>
+          </Button>
+
+          {/* Create Button */}
           <Button
             variant="default"
             size="sm"
@@ -104,6 +116,7 @@ export default function ExercisesPage() {
         onExerciseCreated={fetchExercises}
       />
 
+      {/* ERROR STATE */}
       {error && (
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-destructive flex items-start gap-3 shadow-sm">
           <IconAlertCircle className="h-5 w-5 mt-0.5" />
@@ -117,6 +130,7 @@ export default function ExercisesPage() {
         </div>
       )}
 
+      {/* TABLE / LOADING STATE */}
       {loading && data.length === 0 ? (
         <div className="flex h-[400px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed bg-muted/30">
           <IconLoader2 className="h-10 w-10 animate-spin text-primary/40" />
@@ -128,12 +142,14 @@ export default function ExercisesPage() {
             <DataTable<Exercise>
               data={data}
               columns={getColumns(fetchExercises)}
-              filterColumn="intensityLevel"
+              filterColumn="exerciseType"
               filters={[
-                { label: "Beginner", value: "BEGINNER" },
-                { label: "Intermediate", value: "INTERMEDIATE" },
-                { label: "Advanced", value: "ADVANCED" },
-                { label: "Nightmare", value: "NIGHTMARE" },
+                { label: "Cardio", value: "CARDIO" },
+                { label: "Strength", value: "STRENGTH" },
+                { label: "Strongman", value: "STRONGMAN" },
+                { label: "Stretching", value: "STRETCHING" },
+                { label: "Powerlifting", value: "POWERLIFTING" },
+                { label: "Plyometrics", value: "PLYOMETRICS" },
               ]}
             />
           </div>

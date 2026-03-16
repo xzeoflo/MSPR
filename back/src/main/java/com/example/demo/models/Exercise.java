@@ -19,12 +19,16 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
-    private Integer durationInSeconds;
-    private Integer repetitions;
-    private Integer sets;
-    private Integer caloriesBurned;
+
+    private Integer durationInSeconds = 0;
+    private Integer repetitions = 0;
+    private Integer sets = 0;
+    private Integer caloriesBurned = 0;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -33,12 +37,16 @@ public class Exercise {
     private String exerciseType;
 
     @Enumerated(EnumType.STRING)
-    private DataStatus status = DataStatus.APPROVED;
+    @Column(nullable = false)
+    private DataStatus status = DataStatus.PENDING;
+
+    @Column(name = "origin_source")
+    private String originSource = "EXTERNAL_API";
 
     @ElementCollection
     @CollectionTable(name = "exercise_equipments", joinColumns = @JoinColumn(name = "exercise_id"))
     @Column(name = "equipment_name")
-    private List<String> exerciseEquipments;
+    private List<String> exerciseEquipments = new ArrayList<>();
 
     private Integer sequenceOrder;
 

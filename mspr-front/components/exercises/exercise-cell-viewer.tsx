@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { getAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { IconPlus, IconX, IconBarbell } from "@tabler/icons-react";
 import {
   Select,
   SelectContent,
@@ -32,16 +34,17 @@ import {
 const EXERCISE_TYPES = [
   { label: "Cardio", value: "CARDIO" },
   { label: "Strength", value: "STRENGTH" },
-  { label: "Flexibility", value: "FLEXIBILITY" },
-  { label: "Hiit", value: "HIIT" },
-  { label: "Core", value: "CORE" },
+  { label: "Strongman", value: "STRONGMAN" },
+  { label: "Stretching", value: "STRETCHING" },
+  { label: "Powerlifting", value: "POWERLIFTING" },
+  { label: "Plyometrics", value: "PLYOMETRICS" },
+  { label: "Olympic Weightlifting", value: "OLYMPIC WEIGHTLIFTING" },
 ];
 
 const INTENSITY_LEVELS = [
   { label: "Beginner", value: "BEGINNER" },
   { label: "Intermediate", value: "INTERMEDIATE" },
   { label: "Advanced", value: "ADVANCED" },
-  { label: "Nightmare", value: "NIGHTMARE" },
 ];
 
 interface ExerciseCellViewerProps {
@@ -53,6 +56,30 @@ export function ExerciseCellViewer({ item, onExerciseUpdated }: ExerciseCellView
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+
+  // Gestion locale des équipements pour l'édition
+  const [equipments, setEquipments] = React.useState<string[]>(item.exerciseEquipments || []);
+  const [equipmentInput, setEquipmentInput] = React.useState("");
+
+  // On reset l'état local quand l'item change ou que le drawer s'ouvre
+  React.useEffect(() => {
+    if (isOpen) {
+      setEquipments(item.exerciseEquipments || []);
+    }
+  }, [isOpen, item.exerciseEquipments]);
+
+  const addEquipment = () => {
+    const val = equipmentInput.trim();
+    if (val && !equipments.includes(val)) {
+      setEquipments([...equipments.filter(e => e !== "None"), val]);
+      setEquipmentInput("");
+    }
+  };
+
+  const removeEquipment = (name: string) => {
+    const next = equipments.filter(e => e !== name);
+    setEquipments(next.length === 0 ? ["None"] : next);
+  };
 
   const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -72,6 +99,7 @@ export function ExerciseCellViewer({ item, onExerciseUpdated }: ExerciseCellView
       repetitions: parseInt(rawData.repetitions as string) || 0,
       sets: parseInt(rawData.sets as string) || 0,
       caloriesBurned: parseInt(rawData.caloriesBurned as string) || 0,
+      exerciseEquipments: equipments, // On envoie la liste mise à jour
     };
 
     try {
@@ -136,6 +164,51 @@ export function ExerciseCellViewer({ item, onExerciseUpdated }: ExerciseCellView
                 <div className="grid gap-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea id="description" name="description" defaultValue={item.description} className="min-h-[80px]" required />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* SECTION EQUIPMENTS AJOUTÉE */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-primary uppercase tracking-widest">Equipment</h4>
+                  <IconBarbell size={16} className="text-muted-foreground" />
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {equipments.filter(e => e !== "None").map((eq) => (
+                    <Badge key={eq} variant="secondary" className="pl-2 pr-1 py-1 gap-1 bg-zinc-900 border-zinc-800 text-zinc-300">
+                      {eq}
+                      <button
+                        type="button"
+                        onClick={() => removeEquipment(eq)}
+                        className="rounded-full hover:bg-zinc-800 p-0.5 transition-colors"
+                      >
+                        <IconX size={12} />
+                      </button>
+                    </Badge>
+                  ))}
+                  {equipments.every(e => e === "None") && (
+                    <span className="text-zinc-500 italic text-xs">Bodyweight (No equipment)</span>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Ex: Dumbbells, Kettlebell..."
+                    value={equipmentInput}
+                    onChange={(e) => setEquipmentInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addEquipment();
+                      }
+                    }}
+                  />
+                  <Button type="button" variant="outline" size="icon" onClick={addEquipment}>
+                    <IconPlus size={18} />
+                  </Button>
                 </div>
               </div>
 

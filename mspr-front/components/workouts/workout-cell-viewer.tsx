@@ -76,7 +76,6 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
         ...prev,
         {
           ...ex,
-          // On garde l'ID s'il vient de la base pour que le backend sache quoi lier
           id: ex.id,
           sequenceOrder: prev.length + 1
         }
@@ -191,7 +190,6 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
                       <SelectItem value="BEGINNER">Beginner</SelectItem>
                       <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                       <SelectItem value="ADVANCED">Advanced</SelectItem>
-                      <SelectItem value="NIGHTMARE">Nightmare</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -204,9 +202,11 @@ export function WorkoutCellViewer({ item, onWorkoutUpdated }: WorkoutCellViewerP
                     <SelectContent>
                       <SelectItem value="STRENGTH">Strength</SelectItem>
                       <SelectItem value="CARDIO">Cardio</SelectItem>
-                      <SelectItem value="HIIT">HIIT</SelectItem>
-                      <SelectItem value="CORE">Core</SelectItem>
-                      <SelectItem value="FLEXIBILITY">Flexibility</SelectItem>
+                      <SelectItem value="STRONGMAN">Strongman</SelectItem>
+                      <SelectItem value="STRETCHING">Stretching</SelectItem>
+                      <SelectItem value="POWERLIFTING">Powerlifting</SelectItem>
+                      <SelectItem value="PLYOMETRICS">Plyometrics</SelectItem>
+                      <SelectItem value="OLYMPIC_WEIGHTLIFTING">Olympic Weightlifting</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

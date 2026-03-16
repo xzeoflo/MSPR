@@ -91,7 +91,7 @@ export default function UsersPage() {
 
           <Separator orientation="vertical" className="h-6 mx-1 hidden sm:block" />
 
-          <Button
+          {/*<Button
             variant="default"
             size="sm"
             onClick={() => setCreateOpen(true)}
@@ -99,7 +99,7 @@ export default function UsersPage() {
           >
             <IconPlus size={18} />
             <span className="font-semibold">Create User</span>
-          </Button>
+          </Button>*/}
         </div>
       </div>
 

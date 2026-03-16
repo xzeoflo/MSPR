@@ -32,32 +32,20 @@ public class DashboardController {
     private final ExerciseService exerciseService;
     private final MealService mealService;
 
-    /**
-     * Retourne les compteurs rapides (Users, Workouts, Exercises)
-     */
     @GetMapping("/stats")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<Map<String, Long>> getQuickStats(Authentication auth) {
         User user = (User) auth.getPrincipal();
-        // Pour l'admin global, on passe null pour tout voir
         String brand = ("ADMIN".equals(user.getRole().name())) ? null : user.getPartnerBrand();
         String role = user.getRole().name();
 
-        long userCount = userService.getAllUsers(brand).size();
-        long workoutCount = workoutService.getAllWorkouts(brand).size();
-        long exerciseCount = exerciseService.getAll(brand, role).size();
-        long mealCount = mealService.getAllMeals(brand).size(); // <-- Nouveau compteur
-
         return ResponseEntity.ok(Map.of(
-                "totalUsers", userCount,
-                "totalWorkouts", workoutCount,
-                "totalExercises", exerciseCount,
-                "totalMeals", mealCount)); // <-- Ajout à la réponse
+                "totalUsers", (long) userService.getAllUsers(brand).size(),
+                "totalWorkouts", (long) workoutService.getAllWorkouts(brand).size(),
+                "totalExercises", (long) exerciseService.getAll(brand, role).size(),
+                "totalMeals", (long) mealService.getAllMeals(brand).size()));
     }
 
-    /**
-     * Répartition des Workouts par type (STRENGTH, CARDIO, etc.)
-     */
     @GetMapping("/stats/types")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<List<Map<String, Object>>> getWorkoutTypeStats(Authentication auth) {
@@ -71,48 +59,24 @@ public class DashboardController {
         return ResponseEntity.ok(mapToChartData(counts));
     }
 
-    /**
-     * Répartition des Repas par type (mealType)
-     */
     @GetMapping("/stats/meals-types")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<List<Map<String, Object>>> getMealTypeStats(Authentication auth) {
         User user = (User) auth.getPrincipal();
-        // On récupère le brand pour filtrer les repas accessibles
         String brand = ("ADMIN".equals(user.getRole().name())) ? null : user.getPartnerBrand();
 
         List<Meal> meals = mealService.getAllMeals(brand);
 
         Map<String, Long> counts = meals.stream()
                 .collect(Collectors.groupingBy(
-                        m -> m.getMealType() != null ? m.getMealType().toLowerCase() : "autre",
+                        m -> (m.getMealType() == null || m.getMealType().isBlank())
+                                ? "other"
+                                : m.getMealType().trim().toLowerCase(),
                         Collectors.counting()));
 
         return ResponseEntity.ok(mapToChartData(counts));
     }
 
-    /**
-     * Répartition des Repas par Marque (Admin seulement)
-     */
-    @GetMapping("/stats/meals-brands")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Map<String, Object>>> getMealBrandDistribution() {
-        // En tant qu'admin global, on récupère TOUS les repas (brand null)
-        List<Meal> allMeals = mealService.getAllMeals(null);
-
-        Map<String, Long> counts = allMeals.stream()
-                .collect(Collectors.groupingBy(
-                        m -> m.getPartnerBrand() != null ? m.getPartnerBrand() : "Internal",
-                        Collectors.counting()));
-
-        return ResponseEntity.ok(mapToChartData(counts));
-    }
-
-    /**
-     * Répartition des Utilisateurs :
-     * - ADMIN : Par Marque (PartnerBrand)
-     * - COACH : Par Rôle (Coach vs Clients)
-     */
     @GetMapping("/stats/users-distribution")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<List<Map<String, Object>>> getUserDistribution(Authentication auth) {
@@ -130,17 +94,12 @@ public class DashboardController {
                             Collectors.counting()));
         } else {
             counts = allUsers.stream()
-                    .collect(Collectors.groupingBy(
-                            u -> u.getRole().name(),
-                            Collectors.counting()));
+                    .collect(Collectors.groupingBy(u -> u.getRole().name(), Collectors.counting()));
         }
 
         return ResponseEntity.ok(mapToChartData(counts));
     }
 
-    /**
-     * Répartition des Exercices par type
-     */
     @GetMapping("/stats/exercises-distribution")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<List<Map<String, Object>>> getExerciseDistribution(Authentication auth) {
@@ -174,12 +133,12 @@ public class DashboardController {
                 .filter(m -> m.getPartnerBrand() != null)
                 .collect(Collectors.groupingBy(Meal::getPartnerBrand, Collectors.counting()));
 
-        List<Map<String, Object>> chartData = new ArrayList<>();
         java.util.Set<String> brands = new java.util.HashSet<>();
         brands.addAll(workoutsByBrand.keySet());
         brands.addAll(usersByBrand.keySet());
         brands.addAll(mealsByBrand.keySet());
 
+        List<Map<String, Object>> chartData = new ArrayList<>();
         for (String brand : brands) {
             Map<String, Object> row = new HashMap<>();
             row.put("brand", brand);
@@ -199,17 +158,13 @@ public class DashboardController {
         for (Map.Entry<String, Long> entry : counts.entrySet()) {
             Map<String, Object> row = new HashMap<>();
             String name = entry.getKey();
-            row.put("name", name);
+            row.put("name", name.substring(0, 1).toUpperCase() + name.substring(1)); // Capitalize
             row.put("type", name);
             row.put("value", entry.getValue());
-            row.put("count", entry.getValue());
             row.put("fill", "var(--chart-" + colorIndex + ")");
-
             chartData.add(row);
-
             colorIndex = (colorIndex % 5) + 1;
         }
         return chartData;
-
     }
 }

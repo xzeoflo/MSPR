@@ -12,4 +12,6 @@ import java.util.List;
 public interface MealRepository extends JpaRepository<Meal, Integer> {
     @Query("SELECT m FROM Meal m WHERE :brand IS NULL OR m.partnerBrand = :brand")
     List<Meal> findByPartnerBrand(@Param("brand") String brand);
+
+    boolean existsByName(String name);
 }

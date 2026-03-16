@@ -4,5 +4,4 @@ public enum Intensity {
     BEGINNER,
     INTERMEDIATE,
     ADVANCED,
-    NIGHTMARE
 }

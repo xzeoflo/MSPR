@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.demo.models.enums.DataStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -20,6 +21,13 @@ public class Meal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meal_id")
     private Integer id;
+
+    @Column(name = "name")
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private DataStatus status = DataStatus.PENDING;
 
     @Column(name = "meal_type")
     private String mealType;
@@ -47,12 +55,6 @@ public class Meal {
 
     @Column(name = "sugar_g")
     private Double sugarG;
-
-    @Column(name = "sodium_mg")
-    private Double sodiumMg;
-
-    @Column(name = "cholesterol_mg")
-    private Double cholesterolMg;
 
     @Column(name = "partner_brand")
     private String partnerBrand;

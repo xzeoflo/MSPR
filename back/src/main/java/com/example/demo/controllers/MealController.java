@@ -91,6 +91,25 @@ public class MealController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/import-csv")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
+    public ResponseEntity<String> importMealsCSV(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            mealService.importMealsFromCSV(file);
+            return ResponseEntity.ok("Importation du CSV réussie.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erreur lors de l'import CSV : " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/bulk-validate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> validateMeals(@RequestBody List<Integer> ids) {
+        mealService.validateMultipleMeals(ids);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/export")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     public ResponseEntity<List<MealExportDTO>> exportMeals(Authentication auth) {

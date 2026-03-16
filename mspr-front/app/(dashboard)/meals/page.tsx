@@ -5,16 +5,24 @@ import { DataTable } from "@/components/data-table";
 import { getColumns } from "@/components/meals/meal-columns";
 import { getAuthToken } from "@/lib/auth";
 import { Meal } from "@/types/meal";
-import { IconAlertCircle, IconLoader2, IconRefresh, IconPlus } from "@tabler/icons-react";
+import {
+  IconAlertCircle,
+  IconLoader2,
+  IconRefresh,
+  IconPlus,
+  IconDownload
+} from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { CreateMealViewer } from "@/components/meals/create-meals-viewer";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 export default function MealsPage() {
   const [data, setData] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false); // État pour l'export
 
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -47,6 +55,73 @@ export default function MealsPage() {
     }
   }, []);
 
+  const handleExportCSV = async () => {
+    const token = getAuthToken();
+    setExporting(true);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/meals/export", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) throw new Error("Export failed");
+
+      const mealsToExport = await response.json();
+      if (mealsToExport.length === 0) {
+        toast.error("No data to export");
+        return;
+      }
+
+      const columns = [
+        { label: "Food_Item", key: "name" },
+        { label: "Category", key: "mealType" },
+        { label: "Calories (kcal)", key: "caloriesKcal" },
+        { label: "Protein (g)", key: "proteinG" },
+        { label: "Carbohydrates (g)", key: "carbsG" },
+        { label: "Fat (g)", key: "fatsG" },
+        { label: "Fiber (g)", key: "fiberG" },
+        { label: "Sugars (g)", key: "sugarG" },
+        { label: "Sodium (mg)", key: "sodiumMg" },
+        { label: "Cholesterol (mg)", key: "cholesterolMg" },
+        { label: "Meal_Type", key: "mealType" },
+        { label: "Water_Intake (ml)", key: "waterIntake" }
+      ];
+
+      const headerRow = columns.map(col => col.label).join(",");
+
+      const dataRows = mealsToExport.map((meal: any) => {
+        return columns.map(col => {
+          const value = meal[col.key];
+
+          if (value === null || value === undefined) {
+            return col.label.includes("(") ? "0" : "";
+          }
+
+          return String(value);
+        }).join(",");
+      });
+
+      const csvContent = "\uFEFF" + [headerRow, ...dataRows].join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `meals_tracker_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+
+      toast.success("CSV Exported (Raw format)");
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred during export");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
     fetchMeals();
@@ -71,6 +146,17 @@ export default function MealsPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            disabled={exporting || loading}
+            className="h-9 gap-2 px-3"
+          >
+            {exporting ? <IconLoader2 size={18} className="animate-spin" /> : <IconDownload size={18} />}
+            <span className="hidden md:inline font-semibold text-xs uppercase tracking-wider">Export</span>
+          </Button>
+
           <Button
             variant="outline"
             size="icon"

@@ -5,11 +5,12 @@ import { Meal } from "@/types/meal";
 import { Button } from "@/components/ui/button";
 import {
   IconDotsVertical,
-  IconToolsKitchen2,
   IconFlame,
   IconLoader2,
   IconScale,
-  IconAlertTriangle
+  IconAlertTriangle,
+  IconLeaf,
+  IconCandy
 } from "@tabler/icons-react";
 import {
   DropdownMenu,
@@ -24,19 +25,14 @@ import { MealCellViewer } from "./meal-cell-viewer";
 
 const ActionCell = ({ meal, onRefresh }: { meal: Meal; onRefresh: () => void }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-
   const handleDelete = async () => {
     setIsDeleting(true);
     const token = getAuthToken();
-
     try {
       const response = await fetch(`http://localhost:8080/api/meals/${meal.id}`, {
         method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
+        headers: { "Authorization": `Bearer ${token}` },
       });
-
       if (response.ok) {
         toast.success(`Meal deleted successfully`);
         onRefresh();
@@ -55,18 +51,11 @@ const ActionCell = ({ meal, onRefresh }: { meal: Meal; onRefresh: () => void }) 
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="size-8" disabled={isDeleting}>
-          {isDeleting ? (
-            <IconLoader2 className="animate-spin size-4" />
-          ) : (
-            <IconDotsVertical className="size-4" />
-          )}
+          {isDeleting ? <IconLoader2 className="animate-spin size-4" /> : <IconDotsVertical className="size-4" />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          className="text-red-600 focus:text-red-600 font-medium"
-          onClick={handleDelete}
-        >
+        <DropdownMenuItem className="text-red-600 focus:text-red-600 font-medium" onClick={handleDelete}>
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -79,36 +68,34 @@ export const getColumns = (fetchMeals: () => void): ColumnDef<Meal>[] => [
     id: "_blank",
     header: "",
     cell: () => <div className="w-2" />,
-    enableSorting: false,
-    enableHiding: false,
   },
   {
-    accessorKey: "mealType",
-    header: "Meal",
-    cell: ({ row }) => (
-      <MealCellViewer
-        item={row.original}
-        onMealUpdated={fetchMeals}
-      />
-    ),
-  },
-  {
-    accessorKey: "quantityG",
-    header: "Portion",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-        <IconScale size={14} />
-        {row.original.quantityG}g
-      </div>
-    ),
+    accessorKey: "name",
+    header: "Dish & Type",
+    cell: ({ row }) => {
+      const { name, mealType } = row.original;
+      return (
+        <div className="flex flex-col min-w-[200px] py-1">
+
+          <MealCellViewer
+            item={row.original}
+            onMealUpdated={fetchMeals}
+          />
+
+          <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1 px-1">
+            {mealType || "Uncategorized"}
+          </span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "caloriesKcal",
     header: "Energy",
     cell: ({ row }) => (
-      <div className="flex items-center gap-1 text-xs font-bold text-orange-600">
+      <div className="flex items-center text-orange-500 gap-1.5 text-sm font-medium">
         <IconFlame size={14} />
-        {row.original.caloriesKcal} <span className="text-[10px] ml-0.5 uppercase">kcal</span>
+        {row.original.caloriesKcal} <span className="text-s ml-0.5 uppercase opacity-70">kcal</span>
       </div>
     ),
   },
@@ -120,29 +107,46 @@ export const getColumns = (fetchMeals: () => void): ColumnDef<Meal>[] => [
       return (
         <div className="flex items-center gap-3">
           <div className="flex flex-col">
-            <span className="text-[10px] text-muted-foreground font-bold uppercase">Prot</span>
-            <span className="text-xs font-bold text-blue-600">{proteinG}g</span>
+            <span className="text-m  text-muted-foreground font-bold uppercase">Prot</span>
+            <span className="text-s font-bold text-blue-600">{proteinG}g</span>
           </div>
-          <div className="flex flex-col border-l pl-3">
-            <span className="text-[10px] text-muted-foreground font-bold uppercase">Carbs</span>
-            <span className="text-xs font-bold text-emerald-600">{carbsG}g</span>
+          <div className="flex flex-col border-l border-border/50 pl-3">
+            <span className="text-m  text-muted-foreground font-bold uppercase">Carbs</span>
+            <span className="text-s font-bold text-emerald-600">{carbsG}g</span>
           </div>
-          <div className="flex flex-col border-l pl-3">
-            <span className="text-[10px] text-muted-foreground font-bold uppercase">Fats</span>
-            <span className="text-xs font-bold text-amber-600">{fatsG}g</span>
+          <div className="flex flex-col border-l border-border/50 pl-3">
+            <span className="text-m  text-muted-foreground font-bold uppercase">Fats</span>
+            <span className="text-s font-bold text-amber-600">{fatsG}g</span>
           </div>
         </div>
       );
     },
   },
   {
+    id: "extra-nutrients",
+    header: "Fiber & Sugar",
+    cell: ({ row }) => (
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-1.5 text-m  font-medium text-emerald-600">
+          <IconLeaf size={12} />
+          <span>{row.original.fiberG}g <span className="text-m  ml-0.5 uppercase opacity-80">fiber</span></span>
+        </div>
+        <div className="flex items-center gap-1.5 text-m font-medium text-pink-600">
+          <IconCandy size={12} />
+          <span>{row.original.sugarG}g <span className="text-m  ml-0.5 uppercase opacity-80">sugar</span></span>
+        </div>
+      </div>
+    ),
+  },
+  {
     accessorKey: "allergies",
     header: "Allergies",
     cell: ({ row }) => {
       const allergies = row.original.allergies;
-      if (!allergies || allergies === "None") return <span className="text-muted-foreground text-xs italic">None</span>;
+      if (!allergies || ["None", "none", "", "Aucune"].includes(allergies))
+        return <span className="ml-0.5 text-muted-foreground text-m  italic opacity-50">None</span>;
       return (
-        <div className="flex items-center gap-1 text-xs font-medium text-red-500 bg-red-50 dark:bg-red-950/30 px-2 py-0.5 rounded-full w-fit border border-red-100 dark:border-red-900/50">
+        <div className="flex items-center gap-1 text-m  font-bold text-red-500 bg-red-50 dark:bg-red-950/30 px-2 py-0.5 rounded-full border border-red-100 dark:border-red-900/50 w-fit">
           <IconAlertTriangle size={12} />
           {allergies}
         </div>
@@ -151,9 +155,9 @@ export const getColumns = (fetchMeals: () => void): ColumnDef<Meal>[] => [
   },
   {
     accessorKey: "partnerBrand",
-    header: "Brand",
+    header: "Source",
     cell: ({ row }) => (
-      <div className="text-xs font-semibold text-muted-foreground italic">
+      <div className="text-xs font-bold text-muted-foreground/70 uppercase tracking-tight">
         {row.original.partnerBrand || "Generic"}
       </div>
     ),

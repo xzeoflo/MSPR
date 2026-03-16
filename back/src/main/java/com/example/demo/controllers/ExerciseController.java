@@ -4,18 +4,20 @@ import com.example.demo.dto.ExerciseDTO;
 import com.example.demo.models.Exercise;
 import com.example.demo.models.User;
 import com.example.demo.services.ExerciseService;
+import com.example.demo.services.ExerciseSyncService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import com.example.demo.services.ExerciseSyncService;
 
 @RestController
 @RequestMapping("/api/exercises")
 @RequiredArgsConstructor
 public class ExerciseController {
+
     private final ExerciseService exerciseService;
     private final ExerciseSyncService exerciseSyncService;
 
@@ -75,9 +77,20 @@ public class ExerciseController {
     public ResponseEntity<String> importExercises(@RequestBody List<ExerciseDTO> exerciseDTOs) {
         try {
             exerciseService.importExercises(exerciseDTOs);
-            return ResponseEntity.ok("Importation réussie de " + exerciseDTOs.size() + " exercices.");
+            return ResponseEntity.ok("Importation réussie.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Erreur lors de l'import : " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/sync")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> syncWithExternalApi() {
+        try {
+            exerciseSyncService.syncExercises();
+            return ResponseEntity.ok("Sync OK. Exercices en attente de modération.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur sync : " + e.getMessage());
         }
     }
 
@@ -102,18 +115,7 @@ public class ExerciseController {
 
     @GetMapping("/rejected")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Exercise>> getRejected(Authentication auth) {
+    public ResponseEntity<List<Exercise>> getRejected() {
         return ResponseEntity.ok(exerciseService.getRejectedExercises());
-    }
-
-    @PostMapping("/sync")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> syncWithExternalApi() {
-        try {
-            exerciseSyncService.syncExercises();
-            return ResponseEntity.ok("Synchronisation avec l'API externe terminée (voir logs pour le détail).");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Erreur lors de la synchronisation : " + e.getMessage());
-        }
     }
 }

@@ -77,7 +77,6 @@ const getIntensityColor = (level: string) => {
     case "BEGINNER": return "bg-emerald-700 border-emerald-700";
     case "INTERMEDIATE": return "bg-yellow-700 border-yellow-700";
     case "ADVANCED": return "bg-red-700 border-red-700";
-    case "NIGHTMARE": return "bg-purple-700 border-purple-700";
     default: return "bg-slate-700 border-slate-700";
   }
 };
@@ -108,6 +107,32 @@ export const getColumns = (fetchExercises: () => void): ColumnDef<Exercise>[] =>
         {row.original.exerciseType}
       </span>
     ),
+  },
+  {
+    accessorKey: "exerciseEquipments",
+    header: "Equipment",
+    cell: ({ row }) => {
+      const equipments = row.original.exerciseEquipments || [];
+
+      const filteredEquips = equipments.filter(e => e.toLowerCase() !== "none");
+
+      if (filteredEquips.length === 0) {
+        return <span className="px-1.5 py-0.5 rounded-md border border-zinc-800 bg-zinc-900 text-zinc-400 text-[9px] font-bold uppercase tracking-wider">Bodyweight</span>;
+      }
+
+      return (
+        <div className="flex flex-wrap gap-1">
+          {filteredEquips.map((eq, index) => (
+            <div
+              key={index}
+              className="px-1.5 py-0.5 rounded-md border border-zinc-800 bg-zinc-900 text-zinc-400 text-[9px] font-bold uppercase tracking-wider"
+            >
+              {eq}
+            </div>
+          ))}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "intensityLevel",
