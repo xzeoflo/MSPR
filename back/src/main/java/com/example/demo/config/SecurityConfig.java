@@ -33,7 +33,17 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // --- ROUTES PUBLIQUES ---
                         .requestMatchers("/api/auth/**").permitAll()
+
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/api/exercises/sync").permitAll()
 
                         .anyRequest().authenticated())

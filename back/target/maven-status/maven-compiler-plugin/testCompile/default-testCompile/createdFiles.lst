@@ -1,1 +1,4 @@
-com/example/demo/MsprApplicationTests.class
+com\example\demo\services\WorkoutServiceTest.class
+com\example\demo\services\ExerciseServiceTest.class
+com\example\demo\MsprApplicationTests.class
+com\example\demo\services\MealServiceTest.class
